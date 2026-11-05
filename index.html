@@ -11,6 +11,67 @@
 </head>
 
 <body>
+    
+<!-- 편지형 스플래시 화면 -->
+<div id="splash" class="splash">
+  <div class="splash__background"></div>
+
+  <div class="splash__content">
+    <p class="splash__eyebrow">
+      A BIRTHDAY STORY
+    </p>
+
+    <h1 class="splash__title">Dear Morara</h1>
+
+    <p class="splash__subtitle">
+      너에게 닿는 열흘의 이야기
+    </p>
+
+    <!-- 편지 봉투 -->
+    <button
+      id="envelope"
+      class="envelope"
+      type="button"
+      aria-label="편지 열기"
+      aria-expanded="false"
+    >
+      <span class="envelope__back"></span>
+      <span class="envelope__letter"></span>
+      <span class="envelope__front"></span>
+      <span class="envelope__flap"></span>
+      <span class="envelope__seal">♥</span>
+    </button>
+
+    <!-- 편지 내용 -->
+    <div id="splash-letter" class="splash-letter">
+      <p class="splash-letter__label">TO. YOU</p>
+
+      <h2>작은 이야기가 도착했어요.</h2>
+
+      <p>
+        열흘 동안 이어질 특별한 이야기.<br>
+        오늘, 첫 번째 페이지를 열어볼까요?
+      </p>
+
+      <button
+        id="start-story"
+        class="splash-letter__start"
+        type="button"
+      >
+        이야기 시작하기
+      </button>
+    </div>
+
+    <p class="splash__hint">
+      봉투를 눌러 편지를 열어보세요
+    </p>
+
+    <p class="splash__footer">
+      FAN-MADE BIRTHDAY PROJECT
+    </p>
+  </div>
+</div>
+
     <main class="game">
         <header class="header">
             <div class="profile"><img src="./assets/images/profile.png" alt="임시 프로필">

@@ -1,0 +1,371 @@
+
+/* ========================================
+   Dear Morara - Letter Splash
+======================================== */
+
+.splash {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 100dvh;
+  overflow-y: auto;
+
+  padding: 32px 20px;
+
+  background: #191525;
+  color: #ffe4f0;
+  font-family: "Pretendard", sans-serif;
+
+  transition:
+    opacity 0.7s ease,
+    visibility 0.7s ease;
+
+  &.is-hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  &__background {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+
+    background:
+      radial-gradient(
+        circle at 50% 42%,
+        rgba(239, 143, 194, 0.17),
+        transparent 52%
+      ),
+      radial-gradient(
+        circle at 80% 80%,
+        rgba(137, 105, 178, 0.13),
+        transparent 40%
+      );
+  }
+
+  &__content {
+    position: relative;
+    z-index: 1;
+
+    width: min(100%, 480px);
+    margin: auto;
+    text-align: center;
+  }
+
+  &__eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.32em;
+    color: #f2b6d6;
+  }
+
+  &__title {
+    margin: 16px 0 8px;
+
+    font-size: clamp(38px, 8vw, 58px);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+  }
+
+  &__subtitle {
+    margin: 0;
+    font-size: 14px;
+    color: #d7b8cc;
+  }
+
+  &__hint {
+    margin-top: 34px;
+    font-size: 12px;
+    color: #bba6bd;
+    transition: opacity 0.3s ease;
+  }
+
+  &__footer {
+    margin-top: 42px;
+
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: #86758f;
+  }
+
+  &.is-open &__hint {
+    opacity: 0;
+  }
+}
+
+/* ========================================
+   편지 봉투
+======================================== */
+
+.envelope {
+  position: relative;
+  display: block;
+
+  width: min(280px, 76vw);
+  height: 185px;
+
+  margin: 66px auto 0;
+  padding: 0;
+
+  border: 0;
+  background: transparent;
+
+  cursor: pointer;
+  perspective: 900px;
+
+  filter: drop-shadow(
+    0 18px 30px rgba(0, 0, 0, 0.25)
+  );
+
+  &__back {
+    position: absolute;
+    inset: 0;
+
+    border-radius: 8px;
+    background: #df9bbf;
+  }
+
+  &__letter {
+    position: absolute;
+
+    left: 9%;
+    bottom: 8%;
+
+    width: 82%;
+    height: 82%;
+
+    border-radius: 5px;
+    background: #fff7fa;
+
+    transform: translateY(0);
+    transition: transform 0.75s ease 0.25s;
+  }
+
+  &__front {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+
+    border-radius: 0 0 8px 8px;
+
+    background: #f4bdd9;
+
+    clip-path: polygon(
+      0 0,
+      50% 53%,
+      100% 0,
+      100% 100%,
+      0 100%
+    );
+  }
+
+  &__flap {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+
+    background: #f9cce2;
+
+    clip-path: polygon(
+      0 0,
+      100% 0,
+      50% 58%
+    );
+
+    transform-origin: top center;
+
+    transition:
+      transform 0.65s ease,
+      z-index 0s 0.32s;
+  }
+
+  &__seal {
+    position: absolute;
+    z-index: 5;
+
+    top: 49%;
+    left: 50%;
+
+    display: grid;
+    place-items: center;
+
+    width: 40px;
+    height: 40px;
+
+    border-radius: 50%;
+    background: #bd668f;
+    color: white;
+
+    font-size: 18px;
+
+    transform: translate(-50%, -50%);
+
+    transition:
+      opacity 0.3s ease,
+      transform 0.3s ease;
+  }
+
+  &:focus-visible {
+    outline: 3px solid #fff;
+    outline-offset: 8px;
+    border-radius: 8px;
+  }
+}
+
+/* ========================================
+   봉투 열림
+======================================== */
+
+.splash.is-open {
+  .envelope {
+    pointer-events: none;
+
+    &__flap {
+      transform: rotateX(180deg);
+      z-index: 1;
+    }
+
+    &__letter {
+      transform: translateY(-80px);
+    }
+
+    &__seal {
+      opacity: 0;
+      transform:
+        translate(-50%, -50%)
+        scale(0.6);
+    }
+  }
+}
+
+/* ========================================
+   편지 본문
+======================================== */
+
+.splash-letter {
+  width: min(100%, 340px);
+
+  margin: -20px auto 0;
+  padding: 28px 24px;
+
+  border: 1px solid #f4d6e4;
+  border-radius: 10px;
+
+  background: #fff9fc;
+  color: #493747;
+
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.18);
+
+  opacity: 0;
+  visibility: hidden;
+
+  transform: translateY(24px);
+
+  transition:
+    opacity 0.5s ease,
+    transform 0.5s ease,
+    visibility 0.5s ease;
+
+  &__label {
+    margin: 0 0 12px;
+
+    color: #bb7399;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+  }
+
+  h2 {
+    margin: 0 0 16px;
+
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  p:not(&__label) {
+    font-size: 13px;
+    line-height: 1.9;
+    color: #756473;
+  }
+
+  &__start {
+    display: block;
+    width: 100%;
+
+    margin-top: 24px;
+    padding: 14px 20px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: #db91b8;
+    color: #fff;
+
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+      background 0.2s ease,
+      transform 0.2s ease;
+
+    &:hover {
+      background: #c878a4;
+      transform: translateY(-2px);
+    }
+
+    &:focus-visible {
+      outline: 3px solid #80516f;
+      outline-offset: 3px;
+    }
+  }
+}
+
+.splash.is-open .splash-letter {
+  opacity: 1;
+  visibility: visible;
+
+  transform: translateY(0);
+
+  transition-delay: 0.65s;
+}
+
+/* ========================================
+   모바일
+======================================== */
+
+@media (max-width: 480px) {
+  .splash {
+    padding: 24px 16px;
+  }
+
+  .envelope {
+    margin-top: 50px;
+  }
+
+  .splash-letter {
+    padding: 24px 18px;
+  }
+
+  .splash__footer {
+    margin-top: 28px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .splash,
+  .envelope *,
+  .splash-letter {
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+  }
+}

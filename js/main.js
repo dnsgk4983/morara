@@ -2,11 +2,12 @@
 document.addEventListener("DOMContentLoaded", () => {
   "use strict";
 
-  // ========================================
-  // 기본 설정
-  // ========================================
+  // ==========================================
+  // 1. 기본 설정
+  // ==========================================
 
   const SAVE_KEY = "morara-v2-save";
+  const MESSAGE_DELAY = 500;
 
   const stories = window.MORARA_STORY || [];
 
@@ -18,7 +19,11 @@ document.addEventListener("DOMContentLoaded", () => {
     status: document.getElementById("status"),
     day: document.getElementById("day"),
     affection: document.getElementById("affection"),
-    restart: document.getElementById("restart")
+    restart: document.getElementById("restart"),
+
+    splash: document.getElementById("splash"),
+    envelope: document.getElementById("envelope"),
+    startStory: document.getElementById("start-story")
   };
 
   const imagePaths = {
@@ -29,65 +34,93 @@ document.addEventListener("DOMContentLoaded", () => {
     memory: "./assets/images/memory.png"
   };
 
-  const defaultState = () => ({
+  const PROFILE_IMAGE = "./assets/images/profile.png";
+
+  const createDefaultState = () => ({
     day: 1,
     affection: 0,
     history: [],
     completed: false
   });
 
-  let state = load();
+  let state = loadState();
 
-  // ========================================
-  // 저장 및 불러오기
-  // ========================================
+  let gameStarted = false;
+  let isPlayingMessages = false;
+  let sequenceId = 0;
 
-  function load() {
+  // ==========================================
+  // 2. 저장 및 불러오기
+  // ==========================================
+
+  function loadState() {
     try {
-      const saved = JSON.parse(
-        localStorage.getItem(SAVE_KEY)
-      );
+      const raw = localStorage.getItem(SAVE_KEY);
+
+      if (!raw) {
+        return createDefaultState();
+      }
+
+      const saved = JSON.parse(raw);
 
       if (
-        saved &&
-        Number.isInteger(saved.day) &&
-        saved.day >= 1 &&
-        saved.day <= 10 &&
-        Array.isArray(saved.history)
+        !saved ||
+        !Number.isInteger(saved.day) ||
+        saved.day < 1 ||
+        saved.day > 10 ||
+        !Array.isArray(saved.history)
       ) {
-        return {
-          ...defaultState(),
-          ...saved
-        };
+        return createDefaultState();
       }
+
+      return {
+        ...createDefaultState(),
+        ...saved,
+        affection: Number.isFinite(saved.affection)
+          ? saved.affection
+          : 0,
+        completed: saved.completed === true
+      };
     } catch (error) {
-      console.warn("저장 데이터 복원 실패:", error);
+      console.error("저장 데이터 불러오기 실패:", error);
+      return createDefaultState();
     }
-
-    return defaultState();
   }
 
-  function save() {
-    localStorage.setItem(
-      SAVE_KEY,
-      JSON.stringify(state)
-    );
+  function saveState() {
+    try {
+      localStorage.setItem(
+        SAVE_KEY,
+        JSON.stringify(state)
+      );
+    } catch (error) {
+      console.error("게임 저장 실패:", error);
+    }
   }
 
-  // ========================================
-  // 화면 업데이트
-  // ========================================
+  // ==========================================
+  // 3. 공통 기능
+  // ==========================================
+
+  function wait(milliseconds) {
+    return new Promise(resolve => {
+      setTimeout(resolve, milliseconds);
+    });
+  }
+
+  function getStory() {
+    return stories.find(story => {
+      return story.day === state.day;
+    });
+  }
 
   function updateStats() {
-    elements.day.textContent =
-      `DAY ${state.day} / 10`;
-
-    elements.affection.textContent =
-      `💗 ${state.affection}`;
+    elements.day.textContent = `DAY ${state.day} / 10`;
+    elements.affection.textContent = `💗 ${state.affection}`;
   }
 
-  function setStatus(text) {
-    elements.status.textContent = text;
+  function setStatus(message) {
+    elements.status.textContent = message;
   }
 
   function scrollBottom() {
@@ -95,27 +128,54 @@ document.addEventListener("DOMContentLoaded", () => {
       elements.chat.scrollHeight;
   }
 
-  // ========================================
-  // 채팅 메시지
-  // ========================================
+  function clearControls() {
+    elements.choices.replaceChildren();
+    elements.freeform.hidden = true;
+  }
 
-  function addMessage(speaker, text, record = true) {
+  function getTime() {
+    return new Date().toLocaleTimeString("ko-KR", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false
+    });
+  }
+
+  function cancelSequence() {
+    sequenceId++;
+    isPlayingMessages = false;
+  }
+
+  
+  // ==========================================
+  // 4. 채팅 메시지 출력
+  // ==========================================
+
+  function addMessage(
+    speaker,
+    text,
+    record = true,
+    restored = false,
+    typing = false
+  ) {
+    const isMe = speaker === "me";
     const row = document.createElement("div");
 
-    const isMe = speaker === "me";
+    row.className = isMe
+      ? "message me"
+      : "message morara";
 
-    row.className =
-      `message ${isMe ? "me" : "morara"}`;
+    if (restored) {
+      row.classList.add("is-restored");
+    }
 
     if (!isMe) {
       const avatar = document.createElement("img");
-
       avatar.className = "message-avatar";
-      avatar.src = "./assets/images/profile.png";
+      avatar.src = PROFILE_IMAGE;
       avatar.alt = "모라라";
 
       avatar.onerror = () => {
-        avatar.onerror = null;
         avatar.style.display = "none";
       };
 
@@ -123,93 +183,157 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const content = document.createElement("div");
-    content.className = "message-content";
+    content.className = "message-content content";
 
     if (!isMe) {
       const name = document.createElement("div");
-      name.className = "message-name";
+      name.className = "message-name name";
       name.textContent = "모라라";
       content.appendChild(name);
     }
 
-    const body = document.createElement("div");
-    body.className = "message-body";
-
     const bubble = document.createElement("div");
     bubble.className = "bubble";
-    bubble.textContent = text;
+
+    if (typing) {
+      bubble.classList.add("is-typing");
+      bubble.textContent = "● ● ●";
+    } else {
+      bubble.textContent = text;
+    }
 
     const time = document.createElement("span");
-    time.className = "message-time";
+    time.className = "message-time time";
+    time.textContent = getTime();
 
-    time.textContent = new Date().toLocaleTimeString(
-      "ko-KR",
-      {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false
-      }
-    );
-
-    body.append(bubble, time);
-    content.appendChild(body);
+    content.append(bubble, time);
     row.appendChild(content);
-
     elements.chat.appendChild(row);
 
-    if (record) {
+    if (record && !typing) {
       state.history.push({
         type: "message",
         speaker,
         text
       });
 
-      save();
+      saveState();
     }
 
     scrollBottom();
+
+    return { row, bubble };
   }
 
-  // ========================================
-  // 상황별 이미지
-  // ========================================
+  // 모라라의 메시지를 한 글자씩 출력
+  async function typeMessage(text, currentSequence) {
+    const message = addMessage(
+      "morara",
+      "",
+      false,
+      false,
+      true
+    );
 
-  function addImage(imageKey, record = true) {
-    const src = imagePaths[imageKey];
+    const bubble = message.bubble;
 
-    if (!src) return;
+    // 입력 중 표시
+    await wait(550);
+
+    if (currentSequence !== sequenceId) {
+      message.row.remove();
+      return false;
+    }
+
+    bubble.classList.remove("is-typing");
+    bubble.textContent = "";
+
+    // 한 글자씩 출력
+    for (const character of Array.from(text)) {
+      if (currentSequence !== sequenceId) {
+        message.row.remove();
+        return false;
+      }
+
+      bubble.textContent += character;
+      scrollBottom();
+
+      await wait(45);
+    }
+
+    // 메시지 완성 후 저장
+    state.history.push({
+      type: "message",
+      speaker: "morara",
+      text
+    });
+
+    saveState();
+
+    return true;
+  }
+
+
+  
+  // ==========================================
+  // 5. 상황 이미지 출력
+  // ==========================================
+
+  function addImage(
+    imageKey,
+    record = true,
+    restored = false
+  ) {
+    const imagePath =
+      typeof imageKey === "string" &&
+      /^https:\/\//i.test(imageKey)
+        ? imageKey
+        : imagePaths[imageKey];
+
+    if (!imagePath) return;
 
     const row = document.createElement("div");
     row.className = "message morara";
 
+    if (restored) {
+      row.classList.add("is-restored");
+    }
+
     const avatar = document.createElement("img");
     avatar.className = "message-avatar";
-    avatar.src = "./assets/images/profile.png";
+    avatar.src = PROFILE_IMAGE;
     avatar.alt = "모라라";
 
     avatar.onerror = () => {
-      avatar.onerror = null;
       avatar.style.display = "none";
     };
 
     const content = document.createElement("div");
-    content.className = "message-content";
+    content.className = "message-content content";
 
     const image = document.createElement("img");
-    image.className = "chat-image";
-    image.src = src;
-    image.alt = `${imageKey} 상황 이미지`;
+    image.className = "chat-image scene";
+    image.src = imagePath;
+    image.alt = "스토리 상황 이미지";
+    image.loading = "lazy";
+    image.decoding = "async";
+
+    image.style.display = "block";
+    image.style.width = "auto";
+    image.style.height = "auto";
+    image.style.maxWidth = "min(100%, 280px)";
+    image.style.maxHeight = "220px";
+    image.style.objectFit = "contain";
+    image.style.borderRadius = "12px";
 
     image.onload = scrollBottom;
 
     image.onerror = () => {
-      image.onerror = null;
       image.style.display = "none";
     };
 
     content.appendChild(image);
     row.append(avatar, content);
-
     elements.chat.appendChild(row);
 
     if (record) {
@@ -218,17 +342,63 @@ document.addEventListener("DOMContentLoaded", () => {
         imageKey
       });
 
-      save();
+      saveState();
     }
 
     scrollBottom();
   }
 
-  // ========================================
-  // 선택지 표시
-  // ========================================
 
-  function showChoices(options) {
+  
+  // ==========================================
+  // 6. 메시지 순차 재생
+  // ==========================================
+
+  async function playMessages(messages) {
+    if (isPlayingMessages) return false;
+
+    isPlayingMessages = true;
+    clearControls();
+
+    const currentSequence = ++sequenceId;
+
+    for (const message of messages) {
+      await wait(MESSAGE_DELAY);
+
+      if (currentSequence !== sequenceId) {
+        return false;
+      }
+
+      if (message.type === "image") {
+        addImage(message.imageKey);
+        continue;
+      }
+
+      const completed = await typeMessage(
+        message.text,
+        currentSequence
+      );
+
+      if (!completed) {
+        return false;
+      }
+    }
+
+    if (currentSequence !== sequenceId) {
+      return false;
+    }
+
+    isPlayingMessages = false;
+
+    return true;
+  }
+
+
+  // ==========================================
+  // 7. 선택지
+  // ==========================================
+
+  function showChoices(options = []) {
     elements.choices.replaceChildren();
 
     options.forEach(option => {
@@ -239,72 +409,86 @@ document.addEventListener("DOMContentLoaded", () => {
       button.textContent = option.text;
 
       button.addEventListener("click", () => {
-        submitAnswer(
-          option.text,
-          option.score
-        );
+        submitAnswer(option.text, option.score);
       });
 
       elements.choices.appendChild(button);
     });
   }
 
-  // ========================================
-  // 자유 입력 답변 평가
-  // ========================================
+  function enableAnswer() {
+    const story = getStory();
+
+    if (
+      !story ||
+      state.completed ||
+      isPlayingMessages
+    ) {
+      return;
+    }
+
+    showChoices(story.options);
+    elements.freeform.hidden = false;
+
+    setStatus(`${story.day}일차 · ${story.title}`);
+  }
+
+  // ==========================================
+  // 8. 자유 입력 호감도 평가
+  // ==========================================
 
   function evaluateAnswer(text, story) {
     const answer = text.trim().toLowerCase();
 
     if (!answer) return 0;
 
-    const positive = [
+    const positiveWords = [
       "좋아", "고마워", "응원", "멋져",
       "재밌", "함께", "같이", "수고",
       "괜찮", "기대", "도와", "천천히",
       "기억", "최고", "행복"
     ];
 
-    const negative = [
+    const negativeWords = [
       "싫어", "귀찮", "못해", "별로",
       "바보", "닥쳐", "꺼져", "노잼",
       "관심 없어", "형편없"
     ];
 
-    const topicKeywords = {
-      1: ["안녕", "반가워", "이야기", "친해"],
+    const topicWords = {
+      1: ["안녕", "반가", "이야기", "친해"],
       2: ["마크", "마인크래프트", "건축", "집", "나무"],
       3: ["노래", "음악", "커버", "뮤지컬", "목소리"],
       4: ["축구", "토트넘", "골", "응원", "경기"],
       5: ["개복치", "공주", "귀여워", "바다"],
       6: ["게임", "도전", "다시", "연습", "승리"],
       7: ["공연", "무대", "노래", "관객", "응원"],
-      8: ["추억", "기억", "첫날", "즐거웠", "함께"],
+      8: ["추억", "기억", "첫날", "즐거", "함께"],
       9: ["내일", "마지막", "추억", "함께", "기념"],
       10: ["고마워", "행복", "기억", "추억", "앞으로"]
     };
 
     let score = 0;
 
-    positive.forEach(word => {
+    for (const word of positiveWords) {
       if (answer.includes(word)) {
         score += 2;
       }
-    });
+    }
 
-    negative.forEach(word => {
+    for (const word of negativeWords) {
       if (answer.includes(word)) {
         score -= 4;
       }
-    });
+    }
 
-    const keywords = topicKeywords[story.day] || [];
+    const keywords = topicWords[story.day] || [];
 
-    keywords.forEach(word => {
+    for (const word of keywords) {
       if (answer.includes(word)) {
         score += 2;
       }
-    });
+    }
 
     if (answer.length >= 12) {
       score += 1;
@@ -321,9 +505,9 @@ document.addEventListener("DOMContentLoaded", () => {
     return Math.max(-5, Math.min(8, score));
   }
 
-  // ========================================
-  // 호감도에 따른 반응
-  // ========================================
+  // ==========================================
+  // 9. 모라라의 반응
+  // ==========================================
 
   function getReaction(score) {
     if (score >= 6) {
@@ -341,95 +525,130 @@ document.addEventListener("DOMContentLoaded", () => {
     return "앗... 그런 말은 조금 서운한걸...";
   }
 
-  // ========================================
-  // 답변 전송
-  // ========================================
+  
+  // ==========================================
+  // 10. 답변 처리
+  // ==========================================
 
-  function submitAnswer(text, fixedScore = null) {
-    const story = stories.find(
-      item => item.day === state.day
-    );
+  async function submitAnswer(
+    text,
+    fixedScore = null
+  ) {
+    const story = getStory();
 
-    if (!story || state.completed) return;
+    if (
+      !story ||
+      !gameStarted ||
+      state.completed ||
+      isPlayingMessages
+    ) {
+      return;
+    }
 
-    elements.choices.replaceChildren();
-    elements.freeform.hidden = true;
+    const answer = text.trim();
+
+    if (!answer) return;
+
+    clearControls();
     elements.answer.value = "";
 
     const score = fixedScore !== null
       ? fixedScore
-      : evaluateAnswer(text, story);
+      : evaluateAnswer(answer, story);
 
-    addMessage("me", text);
+    // 선택지라면 해당 선택지의 전용 반응 사용
+    const selectedOption = fixedScore !== null
+      ? story.options.find(option => option.text === answer)
+      : null;
+
+    let reply;
+
+    if (selectedOption?.reply) {
+      reply = selectedOption.reply;
+    } else if (score >= 5) {
+      reply = story.freeReplies?.good || getReaction(score);
+    } else if (score >= 1) {
+      reply = story.freeReplies?.normal || getReaction(score);
+    } else {
+      reply = story.freeReplies?.bad || getReaction(score);
+    }
+
+    addMessage("me", answer);
 
     state.affection = Math.max(
       0,
       state.affection + score
     );
 
-    save();
+    state.completed = true;
+
+    saveState();
     updateStats();
 
-    addMessage("morara", getReaction(score));
+    const played = await playMessages([
+      {
+        type: "message",
+        text: reply
+      }
+    ]);
+
+    if (!played) return;
 
     finishDay();
   }
 
-  // ========================================
-  // 하루 시작
-  // ========================================
 
-  function startDay() {
-    const story = stories.find(
-      item => item.day === state.day
-    );
+  // ==========================================
+  // 11. 하루 시작
+  // ==========================================
+
+  async function startDay() {
+    const story = getStory();
 
     if (!story) {
       setStatus("스토리를 찾을 수 없습니다.");
       return;
     }
 
-    elements.chat.replaceChildren();
-    elements.choices.replaceChildren();
+    cancelSequence();
 
-    elements.freeform.hidden = true;
+    elements.chat.replaceChildren();
+    clearControls();
 
     state.history = [];
-    save();
+    state.completed = false;
+
+    saveState();
+    updateStats();
 
     setStatus(`${story.day}일차 · ${story.title}`);
 
-    addMessage(
-      "morara",
-      `오늘은 ${story.theme}에 대해 이야기해 볼까?`
-    );
+    const played = await playMessages([
+      {
+        type: "message",
+        text: `오늘은 ${story.theme}에 대해 이야기해 볼까?`
+      },
+      {
+        type: "image",
+        imageKey: story.image
+      },
+      {
+        type: "message",
+        text: story.prompt
+      }
+    ]);
 
-    addImage(story.image);
+    if (!played) return;
 
-    addMessage("morara", story.prompt);
-
-    showChoices(story.options);
-
-    elements.freeform.hidden = false;
+    enableAnswer();
   }
 
-  // ========================================
-  // 하루 종료
-  // ========================================
+  // ==========================================
+  // 12. 다음 날 버튼
+  // ==========================================
 
-  function finishDay() {
-    state.completed = true;
-    save();
-
-    elements.freeform.hidden = true;
-    elements.choices.replaceChildren();
-
-    if (state.day >= 10) {
-      showEnding();
-      return;
-    }
-
-    setStatus(`${state.day}일차 대화 완료`);
+  function showNextDayButton() {
+    clearControls();
 
     const button = document.createElement("button");
 
@@ -438,147 +657,384 @@ document.addEventListener("DOMContentLoaded", () => {
     button.textContent = "다음 날로 넘어가기 →";
 
     button.addEventListener("click", () => {
-      state.day++;
+      if (state.day >= 10) return;
+
+      state.day += 1;
       state.completed = false;
       state.history = [];
 
-      save();
-      updateStats();
+      saveState();
       startDay();
     });
 
     elements.choices.appendChild(button);
   }
 
-  // ========================================
-  // 엔딩
-  // ========================================
+  // ==========================================
+  // 13. 하루 종료
+  // ==========================================
 
-  function showEnding() {
-    elements.choices.replaceChildren();
-    elements.freeform.hidden = true;
+  function finishDay() {
+    state.completed = true;
+    saveState();
 
-    let ending;
+    clearControls();
 
-    if (state.affection >= 50) {
-      ending = "💗 해피 엔딩";
-    } else if (state.affection >= 25) {
-      ending = "🌸 노멀 엔딩";
-    } else {
-      ending = "💔 배드 엔딩";
+    if (state.day >= 10) {
+      showEnding();
+      return;
     }
 
-    setStatus(ending);
-    addMessage(
-      "morara",
-      `10일 동안 함께해 줘서 고마워!\n${ending}`
-    );
+    setStatus(`${state.day}일차 대화 완료`);
+    showNextDayButton();
   }
 
-  // ========================================
-  // 저장된 기록 복원
-  // ========================================
+  
+  // ==========================================
+  // 14. 엔딩
+  // ==========================================
 
-  function restore() {
+  function getEnding() {
+    if (state.affection >= 50) {
+      return {
+        type: "happy",
+        label: "HAPPY ENDING",
+        title: "우리만의 특별한 추억",
+        message:
+          "함께한 열흘 동안의 모든 순간이 소중했어.\n앞으로도 좋은 추억 많이 만들자!",
+        symbol: "♥"
+      };
+    }
+
+    if (state.affection >= 25) {
+      return {
+        type: "normal",
+        label: "NORMAL ENDING",
+        title: "다음에 또 만날 수 있기를",
+        message:
+          "열흘 동안 함께해 줘서 고마워.\n다음에는 더 많은 이야기를 나눠보자!",
+        symbol: "✦"
+      };
+    }
+
+    return {
+      type: "bad",
+      label: "DISTANT ENDING",
+      title: "조금은 아쉬운 마지막 인사",
+      message:
+        "서로를 알아가기엔 시간이 조금 부족했나 봐.\n그래도 함께해 준 순간은 기억할게.",
+      symbol: "☾"
+    };
+  }
+
+  function showEnding() {
+    clearControls();
+
+    const ending = getEnding();
+
+    setStatus("열흘의 이야기 완료");
+
+    // 중복 결과 화면 방지
+    document.getElementById("ending-screen")?.remove();
+
+    const screen = document.createElement("div");
+    screen.id = "ending-screen";
+    screen.className = `ending-screen ending-screen--${ending.type}`;
+
+    const card = document.createElement("div");
+    card.className = "ending-card";
+
+    const eyebrow = document.createElement("p");
+    eyebrow.className = "ending-card__eyebrow";
+    eyebrow.textContent = "OUR STORY, OUR MEMORIES";
+
+    const brand = document.createElement("h1");
+    brand.className = "ending-card__brand";
+    brand.textContent = "Dear Morara";
+
+    const subtitle = document.createElement("p");
+    subtitle.className = "ending-card__subtitle";
+    subtitle.textContent =
+      "열흘의 이야기가 하나의 추억이 되었습니다.";
+
+    const result = document.createElement("div");
+    result.className = "ending-card__result";
+
+    const symbol = document.createElement("div");
+    symbol.className = "ending-card__symbol";
+    symbol.textContent = ending.symbol;
+
+    const label = document.createElement("p");
+    label.className = "ending-card__label";
+    label.textContent = ending.label;
+
+    const title = document.createElement("h2");
+    title.className = "ending-card__title";
+    title.textContent = ending.title;
+
+    const message = document.createElement("p");
+    message.className = "ending-card__message";
+    message.textContent = ending.message;
+
+    const score = document.createElement("p");
+    score.className = "ending-card__score";
+    score.textContent =
+      `AFFECTION ${state.affection}  ·  10 DAYS`;
+
+    result.append(
+      symbol,
+      label,
+      title,
+      message,
+      score
+    );
+
+    const restartButton = document.createElement("button");
+    restartButton.type = "button";
+    restartButton.className = "ending-card__restart";
+    restartButton.textContent = "처음부터 다시 만나기";
+
+    restartButton.addEventListener("click", () => {
+      const confirmed = confirm(
+        "처음부터 다시 시작하시겠습니까?\n" +
+        "현재 진행 기록이 초기화됩니다."
+      );
+
+      if (!confirmed) return;
+
+      screen.remove();
+      cancelSequence();
+
+      localStorage.removeItem(SAVE_KEY);
+      state = createDefaultState();
+
+      elements.chat.replaceChildren();
+      clearControls();
+      updateStats();
+
+      startDay();
+    });
+
+    const footer = document.createElement("p");
+    footer.className = "ending-card__footer";
+    footer.textContent = "A FAN-MADE BIRTHDAY STORY";
+
+    card.append(
+      eyebrow,
+      brand,
+      subtitle,
+      result,
+      restartButton,
+      footer
+    );
+
+    screen.appendChild(card);
+    document.body.appendChild(screen);
+  }
+
+
+  function showEnding() {
+    clearControls();
+
+    const ending = getEnding();
+
+    setStatus(ending);
+
+    const endingText =
+      `10일 동안 함께해 줘서 고마워!\n${ending}`;
+
+    const alreadyShown = state.history.some(entry => {
+      return (
+        entry.type === "message" &&
+        entry.text === endingText
+      );
+    });
+
+    if (!alreadyShown) {
+      addMessage("morara", endingText);
+    }
+
+    saveState();
+  }
+
+  
+  // ==========================================
+  // 15. 저장된 채팅 복원
+  // ==========================================
+
+  function renderHistory() {
     elements.chat.replaceChildren();
 
-    state.history.forEach(entry => {
+    for (const entry of state.history) {
       if (entry.type === "message") {
-        addMessage(entry.speaker, entry.text, false);
+        addMessage(
+          entry.speaker,
+          entry.text,
+          false,
+          true
+        );
       }
 
       if (entry.type === "image") {
-        addImage(entry.imageKey, false);
+        addImage(
+          entry.imageKey,
+          false,
+          true
+        );
       }
-    });
-
-    updateStats();
-
-    if (state.completed) {
-      if (state.day >= 10) {
-        setStatus("10일차 완료");
-        return;
-      }
-
-      setStatus(`${state.day}일차 대화 완료`);
-
-      const button = document.createElement("button");
-
-      button.className = "choice";
-      button.textContent = "다음 날로 넘어가기 →";
-
-      button.onclick = () => {
-        state.day++;
-        state.completed = false;
-        state.history = [];
-        save();
-        updateStats();
-        startDay();
-      };
-
-      elements.choices.appendChild(button);
-
-      return;
-    }
-
-    if (state.history.length === 0) {
-      startDay();
-      return;
-    }
-
-    const story = stories.find(
-      item => item.day === state.day
-    );
-
-    if (story) {
-      setStatus(`${state.day}일차 · ${story.title}`);
-      showChoices(story.options);
-      elements.freeform.hidden = false;
     }
   }
 
-  // ========================================
-  // 직접 입력 이벤트
-  // ========================================
+  async function restoreGame() {
+    cancelSequence();
+    clearControls();
+    updateStats();
+
+    const story = getStory();
+
+    if (!story) {
+      setStatus("스토리를 찾을 수 없습니다.");
+      return;
+    }
+
+    // 완료한 날짜는 기존 기록 복원
+    if (state.completed) {
+      renderHistory();
+
+      if (state.day >= 10) {
+        showEnding();
+      } else {
+        setStatus(`${state.day}일차 대화 완료`);
+        showNextDayButton();
+      }
+
+      return;
+    }
+
+    // 진행 중인 날짜는 처음부터 순차 재생
+    // (새로고침한 경우에도 채팅이 하나씩 등장)
+    state.history = [];
+    saveState();
+
+    await startDay();
+  }
+
+
+  // ==========================================
+  // 16. 처음부터 시작
+  // ==========================================
+
+  function restartGame() {
+    const confirmed = confirm(
+      "정말 처음부터 시작하시겠습니까?\n" +
+      "모든 진행 기록과 호감도가 초기화됩니다."
+    );
+
+    if (!confirmed) return;
+
+    cancelSequence();
+
+    localStorage.removeItem(SAVE_KEY);
+
+    state = createDefaultState();
+
+    clearControls();
+    elements.chat.replaceChildren();
+
+    updateStats();
+
+    if (gameStarted) {
+      startDay();
+    }
+  }
+
+  
+  // ==========================================
+  // 17. 스플래시 화면
+  // ==========================================
+
+  function initializeSplash() {
+    const splash = elements.splash;
+    const envelope = elements.envelope;
+    const startButton = elements.startStory;
+
+    if (!splash || !envelope || !startButton) {
+      launchGame();
+      return;
+    }
+
+    document.body.style.overflow = "hidden";
+
+    envelope.addEventListener("click", () => {
+      if (splash.classList.contains("is-open")) {
+        return;
+      }
+
+      splash.classList.add("is-open");
+
+      envelope.setAttribute(
+        "aria-expanded",
+        "true"
+      );
+    });
+
+    startButton.addEventListener("click", async () => {
+      if (gameStarted) return;
+
+      startButton.disabled = true;
+      splash.classList.add("is-hidden");
+
+      // 스플래시가 완전히 사라질 때까지 대기
+      await wait(700);
+
+      splash.remove();
+      document.body.style.overflow = "";
+
+      launchGame();
+    });
+  }
+
+
+  // ==========================================
+  // 18. 게임 실행
+  // ==========================================
+
+  function launchGame() {
+    if (gameStarted) return;
+
+    gameStarted = true;
+
+    restoreGame();
+  }
+
+  // ==========================================
+  // 19. 이벤트 연결
+  // ==========================================
 
   elements.freeform.addEventListener(
     "submit",
     event => {
       event.preventDefault();
 
-      const text = elements.answer.value.trim();
+      const answer = elements.answer.value.trim();
 
-      if (!text) return;
+      if (!answer) return;
 
-      submitAnswer(text);
+      submitAnswer(answer);
     }
   );
 
-  // ========================================
-  // 처음부터 시작
-  // ========================================
+  elements.restart.addEventListener(
+    "click",
+    restartGame
+  );
 
-  elements.restart.addEventListener("click", () => {
-    const confirmed = confirm(
-      "정말 처음부터 시작하시겠습니까?\n" +
-      "모든 진행 기록이 초기화됩니다."
-    );
+  // ==========================================
+  // 20. 최초 실행
+  // ==========================================
 
-    if (!confirmed) return;
+  updateStats();
+  clearControls();
 
-    localStorage.removeItem(SAVE_KEY);
-    state = defaultState();
-
-    elements.choices.replaceChildren();
-    elements.freeform.hidden = true;
-
-    updateStats();
-    startDay();
-  });
-
-  // ========================================
-  // 게임 실행
-  // ========================================
-
-  restore();
+  initializeSplash();
 });
