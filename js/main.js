@@ -7,7 +7,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // ==========================================
 
   const SAVE_KEY = "morara-v2-save";
-  const MESSAGE_DELAY = 500;
+  const MESSAGE_DELAY = 350;
+  const TYPING_SPEED = 18;
 
   const stories = window.MORARA_STORY || [];
 
@@ -147,6 +148,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   
+  
   // ==========================================
   // 4. 채팅 메시지 출력
   // ==========================================
@@ -161,9 +163,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const isMe = speaker === "me";
     const row = document.createElement("div");
 
-    row.className = isMe
-      ? "message me"
-      : "message morara";
+    row.className = isMe ? "message me" : "message morara";
 
     if (restored) {
       row.classList.add("is-restored");
@@ -174,11 +174,9 @@ document.addEventListener("DOMContentLoaded", () => {
       avatar.className = "message-avatar";
       avatar.src = PROFILE_IMAGE;
       avatar.alt = "모라라";
-
       avatar.onerror = () => {
         avatar.style.display = "none";
       };
-
       row.appendChild(avatar);
     }
 
@@ -216,16 +214,13 @@ document.addEventListener("DOMContentLoaded", () => {
         speaker,
         text
       });
-
       saveState();
     }
 
     scrollBottom();
-
     return { row, bubble };
   }
 
-  // 모라라의 메시지를 한 글자씩 출력
   async function typeMessage(text, currentSequence) {
     const message = addMessage(
       "morara",
@@ -235,20 +230,17 @@ document.addEventListener("DOMContentLoaded", () => {
       true
     );
 
-    const bubble = message.bubble;
-
-    // 입력 중 표시
-    await wait(550);
+    await wait(250);
 
     if (currentSequence !== sequenceId) {
       message.row.remove();
       return false;
     }
 
+    const bubble = message.bubble;
     bubble.classList.remove("is-typing");
     bubble.textContent = "";
 
-    // 한 글자씩 출력
     for (const character of Array.from(text)) {
       if (currentSequence !== sequenceId) {
         message.row.remove();
@@ -258,10 +250,9 @@ document.addEventListener("DOMContentLoaded", () => {
       bubble.textContent += character;
       scrollBottom();
 
-      await wait(45);
+      await wait(TYPING_SPEED);
     }
 
-    // 메시지 완성 후 저장
     state.history.push({
       type: "message",
       speaker: "morara",
@@ -269,9 +260,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     saveState();
-
     return true;
   }
+
 
 
   
@@ -670,6 +661,7 @@ document.addEventListener("DOMContentLoaded", () => {
     elements.choices.appendChild(button);
   }
 
+  
   // ==========================================
   // 13. 하루 종료
   // ==========================================
@@ -677,187 +669,25 @@ document.addEventListener("DOMContentLoaded", () => {
   function finishDay() {
     state.completed = true;
     saveState();
-
     clearControls();
 
     if (state.day >= 10) {
-      showEnding();
+      setStatus("열흘의 이야기 완료");
+
+      // 마지막 메시지를 읽을 시간을 조금 제공
+      setTimeout(() => {
+        if (state.day === 10 && state.completed) {
+          showEnding();
+        }
+      }, 900);
+
       return;
     }
 
     setStatus(`${state.day}일차 대화 완료`);
     showNextDayButton();
   }
-
-  
-  // ==========================================
-  // 14. 엔딩
-  // ==========================================
-
-  function getEnding() {
-    if (state.affection >= 50) {
-      return {
-        type: "happy",
-        label: "HAPPY ENDING",
-        title: "우리만의 특별한 추억",
-        message:
-          "함께한 열흘 동안의 모든 순간이 소중했어.\n앞으로도 좋은 추억 많이 만들자!",
-        symbol: "♥"
-      };
-    }
-
-    if (state.affection >= 25) {
-      return {
-        type: "normal",
-        label: "NORMAL ENDING",
-        title: "다음에 또 만날 수 있기를",
-        message:
-          "열흘 동안 함께해 줘서 고마워.\n다음에는 더 많은 이야기를 나눠보자!",
-        symbol: "✦"
-      };
-    }
-
-    return {
-      type: "bad",
-      label: "DISTANT ENDING",
-      title: "조금은 아쉬운 마지막 인사",
-      message:
-        "서로를 알아가기엔 시간이 조금 부족했나 봐.\n그래도 함께해 준 순간은 기억할게.",
-      symbol: "☾"
-    };
-  }
-
-  function showEnding() {
-    clearControls();
-
-    const ending = getEnding();
-
-    setStatus("열흘의 이야기 완료");
-
-    // 중복 결과 화면 방지
-    document.getElementById("ending-screen")?.remove();
-
-    const screen = document.createElement("div");
-    screen.id = "ending-screen";
-    screen.className = `ending-screen ending-screen--${ending.type}`;
-
-    const card = document.createElement("div");
-    card.className = "ending-card";
-
-    const eyebrow = document.createElement("p");
-    eyebrow.className = "ending-card__eyebrow";
-    eyebrow.textContent = "OUR STORY, OUR MEMORIES";
-
-    const brand = document.createElement("h1");
-    brand.className = "ending-card__brand";
-    brand.textContent = "Dear Morara";
-
-    const subtitle = document.createElement("p");
-    subtitle.className = "ending-card__subtitle";
-    subtitle.textContent =
-      "열흘의 이야기가 하나의 추억이 되었습니다.";
-
-    const result = document.createElement("div");
-    result.className = "ending-card__result";
-
-    const symbol = document.createElement("div");
-    symbol.className = "ending-card__symbol";
-    symbol.textContent = ending.symbol;
-
-    const label = document.createElement("p");
-    label.className = "ending-card__label";
-    label.textContent = ending.label;
-
-    const title = document.createElement("h2");
-    title.className = "ending-card__title";
-    title.textContent = ending.title;
-
-    const message = document.createElement("p");
-    message.className = "ending-card__message";
-    message.textContent = ending.message;
-
-    const score = document.createElement("p");
-    score.className = "ending-card__score";
-    score.textContent =
-      `AFFECTION ${state.affection}  ·  10 DAYS`;
-
-    result.append(
-      symbol,
-      label,
-      title,
-      message,
-      score
-    );
-
-    const restartButton = document.createElement("button");
-    restartButton.type = "button";
-    restartButton.className = "ending-card__restart";
-    restartButton.textContent = "처음부터 다시 만나기";
-
-    restartButton.addEventListener("click", () => {
-      const confirmed = confirm(
-        "처음부터 다시 시작하시겠습니까?\n" +
-        "현재 진행 기록이 초기화됩니다."
-      );
-
-      if (!confirmed) return;
-
-      screen.remove();
-      cancelSequence();
-
-      localStorage.removeItem(SAVE_KEY);
-      state = createDefaultState();
-
-      elements.chat.replaceChildren();
-      clearControls();
-      updateStats();
-
-      startDay();
-    });
-
-    const footer = document.createElement("p");
-    footer.className = "ending-card__footer";
-    footer.textContent = "A FAN-MADE BIRTHDAY STORY";
-
-    card.append(
-      eyebrow,
-      brand,
-      subtitle,
-      result,
-      restartButton,
-      footer
-    );
-
-    screen.appendChild(card);
-    document.body.appendChild(screen);
-  }
-
-
-  function showEnding() {
-    clearControls();
-
-    const ending = getEnding();
-
-    setStatus(ending);
-
-    const endingText =
-      `10일 동안 함께해 줘서 고마워!\n${ending}`;
-
-    const alreadyShown = state.history.some(entry => {
-      return (
-        entry.type === "message" &&
-        entry.text === endingText
-      );
-    });
-
-    if (!alreadyShown) {
-      addMessage("morara", endingText);
-    }
-
-    saveState();
-  }
-
-  
+    
   // ==========================================
   // 15. 저장된 채팅 복원
   // ==========================================
@@ -867,6 +697,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     for (const entry of state.history) {
       if (entry.type === "message") {
+        // 이전 버전에서 저장된 오류 메시지 제외
+        if (
+          typeof entry.text !== "string" ||
+          entry.text.includes("[object Object]")
+        ) {
+          continue;
+        }
+
         addMessage(
           entry.speaker,
           entry.text,
@@ -897,7 +735,6 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // 완료한 날짜는 기존 기록 복원
     if (state.completed) {
       renderHistory();
 
@@ -911,16 +748,13 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // 진행 중인 날짜는 처음부터 순차 재생
-    // (새로고침한 경우에도 채팅이 하나씩 등장)
     state.history = [];
     saveState();
 
     await startDay();
   }
-
-
-  // ==========================================
+  
+    // ==========================================
   // 16. 처음부터 시작
   // ==========================================
 
@@ -933,22 +767,12 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!confirmed) return;
 
     cancelSequence();
-
     localStorage.removeItem(SAVE_KEY);
 
-    state = createDefaultState();
-
-    clearControls();
-    elements.chat.replaceChildren();
-
-    updateStats();
-
-    if (gameStarted) {
-      startDay();
-    }
+    // 스플래시 화면부터 다시 시작
+    window.location.reload();
   }
 
-  
   // ==========================================
   // 17. 스플래시 화면
   // ==========================================
