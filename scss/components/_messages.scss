@@ -1,0 +1,224 @@
+
+@use "../abstracts/variables" as v;
+@use "../abstracts/mixins" as *;
+
+/* ==========================================
+   Dear Morara - Chat Messages
+========================================== */
+
+// ==========================================
+// 1. 메시지 행
+// ==========================================
+
+.message,
+.msg {
+  display: flex;
+  align-items: flex-start;
+
+  width: 100%;
+  min-width: 0;
+  flex-shrink: 0;
+
+  @include vw(gap, 9px);
+  @include vw(margin-bottom, 12px);
+
+  animation: message-appear 300ms ease both;
+
+  &.morara,
+  &.message--morara,
+  &.msg--morara {
+    justify-content: flex-start;
+  }
+
+  &.me,
+  &.user,
+  &.message--me,
+  &.message--user,
+  &.msg--me,
+  &.msg--user {
+    justify-content: flex-end;
+  }
+}
+
+// ==========================================
+// 2. 메시지 내용 영역
+// ==========================================
+
+.message-content,
+.msg__content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  min-width: 0;
+  max-width: 80%;
+}
+
+.message.me .message-content,
+.message.user .message-content,
+.msg--me .msg__content,
+.msg--user .msg__content {
+  align-items: flex-end;
+}
+
+// ==========================================
+// 3. 말풍선
+// ==========================================
+
+.bubble,
+.msg__bubble {
+  display: block;
+  flex: 0 1 auto;
+
+  width: fit-content;
+  max-width: 100%;
+  min-width: 0;
+
+  @include vw(padding, 12px 15px);
+  @include vw(border-radius, 18px);
+  @include fluid(font-size, 15px, 14px, 16px);
+
+  line-height: 1.6;
+  font-weight: 400;
+
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  word-break: keep-all;
+
+  background: v.$color-bubble-morara;
+  color: v.$color-text;
+
+  box-shadow: 0 3px 12px rgba(91, 47, 88, 0.06);
+}
+
+.message.morara .bubble,
+.message--morara .bubble,
+.msg--morara .msg__bubble {
+  background: v.$color-bubble-morara;
+  border-bottom-left-radius: 5px;
+}
+
+.message.me .bubble,
+.message.user .bubble,
+.message--me .bubble,
+.message--user .bubble,
+.msg--me .msg__bubble,
+.msg--user .msg__bubble {
+  background: v.$color-bubble-me;
+  border-bottom-right-radius: 5px;
+}
+
+// ==========================================
+// 4. 프로필 이미지
+// ==========================================
+
+.message-avatar,
+.avatar,
+.msg__avatar {
+  display: block;
+  flex-shrink: 0;
+
+  @include vw(width, 34px);
+  @include vw(height, 34px);
+
+  border-radius: 50%;
+  object-fit: cover;
+
+  background: #f4d7e8;
+}
+
+// ==========================================
+// 5. 메시지 시간
+// ==========================================
+
+.message-time,
+.time,
+.msg__time {
+  display: block;
+  flex-shrink: 0;
+
+  margin-top: 6px;
+
+  font-size: 10px;
+  line-height: 1.4;
+
+  color: v.$color-text-muted;
+  white-space: nowrap;
+}
+
+// ==========================================
+// 6. 이미지 메시지
+// ==========================================
+
+.message-image,
+.chat-image,
+.msg__image {
+  display: block;
+
+  max-width: 100%;
+  height: auto;
+
+  @include vw(border-radius, 16px);
+
+  box-shadow: 0 4px 16px rgba(91, 47, 88, 0.12);
+}
+
+// ==========================================
+// 7. 타이핑 애니메이션
+// ==========================================
+
+.typing {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 5px;
+
+  span,
+  i {
+    width: 6px;
+    height: 6px;
+
+    border-radius: 50%;
+    background: v.$color-primary-dark;
+
+    animation: typing-bounce 1100ms ease-in-out infinite;
+
+    &:nth-child(2) {
+      animation-delay: 150ms;
+    }
+
+    &:nth-child(3) {
+      animation-delay: 300ms;
+    }
+  }
+}
+
+// ==========================================
+// 8. 애니메이션
+// ==========================================
+
+@keyframes message-appear {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes typing-bounce {
+  0%,
+  60%,
+  100% {
+    opacity: 0.4;
+    transform: translateY(0);
+  }
+
+  30% {
+    opacity: 1;
+    transform: translateY(-5px);
+  }
+}

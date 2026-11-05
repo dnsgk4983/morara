@@ -13,64 +13,64 @@
 <body>
     
 <!-- 편지형 스플래시 화면 -->
+
 <div id="splash" class="splash">
-  <div class="splash__background"></div>
-
-  <div class="splash__content">
-    <p class="splash__eyebrow">
-      A BIRTHDAY STORY
-    </p>
-
-    <h1 class="splash__title">Dear Morara</h1>
-
-    <p class="splash__subtitle">
-      너에게 닿는 열흘의 이야기
-    </p>
-
-    <!-- 편지 봉투 -->
-    <button
-      id="envelope"
-      class="envelope"
-      type="button"
-      aria-label="편지 열기"
-      aria-expanded="false"
+  <div class="splash__scene" id="splash-scene">
+    <img
+      class="splash__art"
+      src="./assets/images/splash.png"
+      alt="모라라가 왕실 정원에서 손을 내밀고 있는 모습"
+      draggable="false"
     >
-      <span class="envelope__back"></span>
-      <span class="envelope__letter"></span>
-      <span class="envelope__front"></span>
-      <span class="envelope__flap"></span>
-      <span class="envelope__seal">♥</span>
-    </button>
 
-    <!-- 편지 내용 -->
-    <div id="splash-letter" class="splash-letter">
-      <p class="splash-letter__label">TO. YOU</p>
+    <div id="crown-target" class="splash__target"></div>
 
-      <h2>작은 이야기가 도착했어요.</h2>
+    <img
+      id="splash-crown"
+      class="splash__crown"
+      src="./assets/images/splash_deco.png"
+      alt="모라라에게 씌울 왕관"
+      draggable="false"
+      tabindex="0"
+      role="button"
+      aria-label="왕관을 모라라에게 씌우기"
+    >
 
-      <p>
-        열흘 동안 이어질 특별한 이야기.<br>
-        오늘, 첫 번째 페이지를 열어볼까요?
-      </p>
-
-      <button
-        id="start-story"
-        class="splash-letter__start"
-        type="button"
-      >
-        이야기 시작하기
-      </button>
+    <div class="splash__sparkles" aria-hidden="true">
+      <span>✦</span>
+      <span>✧</span>
+      <span>✦</span>
+      <span>✧</span>
+      <span>✦</span>
     </div>
 
-    <p class="splash__hint">
-      봉투를 눌러 편지를 열어보세요
-    </p>
+    <div class="splash__content">
+      <p class="splash__eyebrow">A BIRTHDAY STORY</p>
+      <h1 class="splash__title">Dear Morara</h1>
+      <p class="splash__subtitle">너에게 닿는 열흘의 이야기</p>
 
-    <p class="splash__footer">
-      FAN-MADE BIRTHDAY PROJECT
-    </p>
+      <div class="splash__actions">
+        <p id="splash-hint" class="splash__hint">
+          왕관을 모라라에게 씌워주세요
+        </p>
+
+        <button
+          id="start-story"
+          class="splash__start"
+          type="button"
+          hidden
+        >
+          이야기 시작하기
+        </button>
+      </div>
+
+      <p class="splash__footer">
+        FAN-MADE BIRTHDAY PROJECT
+      </p>
+    </div>
   </div>
 </div>
+
 
     <main class="game">
         <header class="header">

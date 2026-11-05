@@ -1,0 +1,107 @@
+
+@use "../abstracts/variables" as v;
+@use "../abstracts/mixins" as *;
+
+/* ==========================================
+   Dear Morara - Profile
+========================================== */
+
+// ==========================================
+// 1. 프로필 전체
+// ==========================================
+
+.profile {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+
+  @include vw(gap, 11px);
+
+  // ========================================
+  // 2. 프로필 이미지
+  // ========================================
+
+  img {
+    display: block;
+    flex-shrink: 0;
+
+    @include vw(width, 46px);
+    @include vw(height, 46px);
+    @include vw(border-radius, 50%);
+
+    object-fit: cover;
+    object-position: center;
+
+    background: #f8ddeb;
+
+    border: 2px solid #ffffff;
+    box-shadow: 0 2px 10px rgba(169, 91, 139, 0.15);
+  }
+
+  // ========================================
+  // 3. 프로필 텍스트 영역
+  // ========================================
+
+  > div {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    flex: 1;
+    min-width: 0;
+  }
+
+  // ========================================
+  // 4. 모라라 이름
+  // ========================================
+
+  strong {
+    display: block;
+
+    @include fluid(font-size, 16px, 14px, 18px);
+
+    font-weight: 750;
+    line-height: 1.4;
+
+    color: v.$color-text;
+
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  // ========================================
+  // 5. 온라인 상태
+  // ========================================
+
+  small {
+    display: block;
+
+    @include fluid(font-size, 11px, 10px, 12px);
+
+    font-weight: 500;
+    line-height: 1.5;
+
+    color: v.$color-text-muted;
+
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+}
+
+// ==========================================
+// 6. 작은 화면 대응
+// ==========================================
+
+@media (max-width: 360px) {
+  .profile {
+    @include vw(gap, 8px);
+
+    img {
+      @include vw(width, 40px);
+      @include vw(height, 40px);
+    }
+  }
+}

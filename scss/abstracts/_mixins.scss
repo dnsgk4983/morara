@@ -1,0 +1,107 @@
+
+@use "sass:math";
+@use "sass:list";
+@use "sass:meta";
+@use "variables" as v;
+
+/* ==========================================
+   Dear Morara - Common Mixins
+========================================== */
+
+// ==========================================
+// 1. px → vw 변환
+// ==========================================
+
+@function to-vw($value, $base: v.$design-width) {
+  @if meta.type-of($value) != "number" {
+    @return $value;
+  }
+
+  @if math.is-unitless($value) {
+    $value: $value * 1px;
+  }
+
+  @if not math.compatible($value, 1px) {
+    @return $value;
+  }
+
+  @return math.div($value, $base) * 100vw;
+}
+
+// ==========================================
+// 2. 반응형 크기 자동 변환
+// ==========================================
+
+@mixin vw($property, $values, $base: v.$design-width) {
+  $result: ();
+
+  @each $value in $values {
+    $result: list.append(
+      $result,
+      to-vw($value, $base),
+      space
+    );
+  }
+
+  @media (max-width: v.$game-max-width) {
+    #{$property}: $result;
+  }
+
+  @media (min-width: (v.$game-max-width + 1px)) {
+    #{$property}: $values;
+  }
+}
+
+// ==========================================
+// 3. 최소·최대 크기 설정
+// ==========================================
+
+@mixin fluid($property, $size, $min, $max) {
+  #{$property}: $size;
+
+  @media (max-width: v.$mobile-breakpoint) {
+    #{$property}: $min;
+  }
+
+  @media (min-width: (v.$mobile-breakpoint + 1px)) {
+    #{$property}: $max;
+  }
+}
+
+// ==========================================
+// 4. 스플래시 이미지 기준 좌표
+// ==========================================
+
+@mixin scene($property, $size) {
+  $ratio: math.div($size, v.$design-width);
+  $mobile-value: $ratio * 100vw;
+  $desktop-value: $ratio * v.$game-max-width;
+
+  @media (max-width: v.$game-max-width) {
+    #{$property}: $mobile-value;
+  }
+
+  @media (min-width: (v.$game-max-width + 1px)) {
+    #{$property}: $desktop-value;
+  }
+}
+
+// ==========================================
+// 5. 모바일
+// ==========================================
+
+@mixin mobile {
+  @media (max-width: v.$mobile-breakpoint) {
+    @content;
+  }
+}
+
+// ==========================================
+// 6. 데스크톱
+// ==========================================
+
+@mixin desktop {
+  @media (min-width: (v.$mobile-breakpoint + 1px)) {
+    @content;
+  }
+}

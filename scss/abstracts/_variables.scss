@@ -1,0 +1,43 @@
+
+/* ==========================================
+   Dear Morara - Design Tokens
+========================================== */
+
+// 디자인 기준
+$design-width: 430px;
+
+// 화면 크기
+$game-max-width: 560px;
+$mobile-breakpoint: 600px;
+
+// 메인 색상
+$color-primary: #e99ac5;
+$color-primary-light: #fff0f8;
+$color-primary-dark: #a95b8b;
+
+// 보조 색상
+$color-lavender: #c9b3ed;
+$color-background: #fff8fc;
+$color-surface: #ffffff;
+
+// 텍스트
+$color-text: #3d3040;
+$color-text-muted: #8f7e91;
+
+// 테두리
+$color-border: #f0dce9;
+
+// 채팅
+$color-bubble-morara: #ffffff;
+$color-bubble-me: #f7cce4;
+
+// 엔딩
+$color-ending-background: #191525;
+
+// 둥근 모서리
+$radius-sm: 10px;
+$radius-md: 16px;
+$radius-lg: 24px;
+
+// 그림자
+$shadow-soft: 0 8px 28px rgba(112, 64, 103, 0.1);

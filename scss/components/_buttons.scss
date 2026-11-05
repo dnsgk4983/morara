@@ -1,0 +1,107 @@
+
+@use "../abstracts/variables" as v;
+@use "../abstracts/mixins" as *;
+
+/* ==========================================
+   Dear Morara - Buttons
+========================================== */
+
+// ==========================================
+// 1. 공통 버튼
+// ==========================================
+
+button {
+  border: 0;
+  background: none;
+  color: inherit;
+
+  transition:
+    background-color 200ms ease,
+    border-color 200ms ease,
+    box-shadow 200ms ease,
+    opacity 200ms ease,
+    transform 200ms ease;
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+}
+
+// ==========================================
+// 2. 다시 시작 버튼
+// ==========================================
+
+#restart {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+
+  @include vw(width, 38px);
+  @include vw(height, 38px);
+  @include vw(border-radius, 12px);
+
+  @include fluid(font-size, 22px, 18px, 24px);
+
+  background: v.$color-primary-light;
+  color: v.$color-primary-dark;
+
+  &:hover:not(:disabled) {
+    background: #f7d9ea;
+  }
+}
+
+// ==========================================
+// 3. 다음 날 진행 버튼
+// ==========================================
+
+.next-day-button,
+.next-day,
+#next-day {
+  display: block;
+  width: 100%;
+
+  @include vw(padding, 14px 20px);
+  @include vw(border-radius, 16px);
+
+  @include fluid(font-size, 15px, 14px, 17px);
+
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.5;
+
+  background: linear-gradient(
+    135deg,
+    v.$color-primary,
+    v.$color-lavender
+  );
+
+  color: #ffffff;
+
+  box-shadow: 0 6px 18px rgba(169, 91, 139, 0.18);
+
+  &:hover:not(:disabled) {
+    filter: brightness(1.04);
+  }
+}
+
+// ==========================================
+// 4. 작은 화면 대응
+// ==========================================
+
+@media (max-width: 360px) {
+  #restart {
+    min-width: 32px;
+    min-height: 32px;
+  }
+
+  .next-day-button,
+  .next-day,
+  #next-day {
+    min-height: 44px;
+  }
+}

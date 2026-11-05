@@ -1,0 +1,59 @@
+
+@use "sass:math";
+@use "sass:list";
+@use "sass:meta";
+@use "variables" as v;
+
+/* ==========================================
+   Dear Morara - Responsive Functions
+========================================== */
+
+// ==========================================
+// 1. 단일 px → 반응형 단위 변환
+// ==========================================
+
+@function to-vw($value, $base: v.$design-width) {
+
+  // px 단위만 변환
+  @if meta.type-of($value) == "number" {
+    @if math.unit($value) == "px" {
+
+      // 단위를 제거한 비율 계산
+      $ratio: math.div($value, $base);
+
+      // 화면 너비가 560px을 넘으면 확대 중지
+      @return calc(
+        min(100vw, #{v.$game-max-width}) * #{$ratio}
+      );
+    }
+  }
+
+  // auto, %, rem, 0 등은 그대로 유지
+  @return $value;
+}
+
+// ==========================================
+// 2. 여러 값 자동 변환
+// ==========================================
+
+@function convert-vw($values, $base: v.$design-width) {
+
+  // 단일 값
+  @if meta.type-of($values) != "list" {
+    @return to-vw($values, $base);
+  }
+
+  // 여러 값
+  $result: ();
+  $separator: list.separator($values);
+
+  @each $value in $values {
+    $result: list.append(
+      $result,
+      to-vw($value, $base),
+      $separator
+    );
+  }
+
+  @return $result;
+}

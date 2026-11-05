@@ -1,0 +1,83 @@
+
+@use "../abstracts/variables" as v;
+@use "../abstracts/mixins" as *;
+
+.footer {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  max-height: 55%;
+  overflow: hidden;
+
+  @include vw(gap, 10px);
+  @include vw(padding, 14px 16px 18px);
+
+  padding-bottom: max(
+    18px,
+    env(safe-area-inset-bottom)
+  );
+
+  background: rgba(255, 255, 255, 0.96);
+  border-top: 1px solid v.$color-border;
+  box-shadow: 0 -5px 20px rgba(112, 64, 103, 0.06);
+
+  .choices {
+    flex: 0 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    scrollbar-width: thin;
+    scrollbar-color: #e7c7de transparent;
+
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #e7c7de;
+      border-radius: 4px;
+    }
+  }
+
+  .freeform {
+    flex-shrink: 0;
+  }
+
+  .status {
+    flex-shrink: 0;
+    min-width: 0;
+
+    @include fluid(font-size, 11px, 10px, 12px);
+
+    line-height: 1.5;
+    text-align: center;
+    color: v.$color-text-muted;
+    overflow-wrap: break-word;
+
+    &:empty {
+      display: none;
+    }
+  }
+}
+
+@media (max-width: 360px) {
+  .footer {
+    @include vw(gap, 8px);
+    @include vw(padding, 10px 10px 14px);
+
+    padding-bottom: max(
+      14px,
+      env(safe-area-inset-bottom)
+    );
+  }
+}
+
+@media (max-height: 600px) {
+  .footer {
+    max-height: 60%;
+  }
+}

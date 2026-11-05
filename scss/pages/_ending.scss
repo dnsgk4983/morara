@@ -1,0 +1,118 @@
+
+@use "../abstracts/variables" as v;
+@use "../abstracts/mixins" as *;
+
+/* ==========================================
+   Dear Morara - Ending Screen
+========================================== */
+
+.ending-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  @include vw(padding, 24px 20px);
+
+  background: rgba(25, 21, 37, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.ending-screen__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 100%;
+  max-width: 430px;
+  margin: auto;
+
+  @include vw(gap, 16px);
+  @include vw(padding, 24px);
+  @include vw(border-radius, 24px);
+
+  background: #fff5fb;
+  box-shadow: 0 16px 50px rgba(20, 12, 35, 0.25);
+  text-align: center;
+}
+
+.ending-screen__image {
+  display: block;
+  width: 100%;
+  max-width: 320px;
+  height: auto;
+  aspect-ratio: 3 / 4;
+
+  @include vw(border-radius, 16px);
+
+  object-fit: cover;
+  box-shadow: 0 6px 24px rgba(96, 40, 80, 0.15);
+}
+
+.ending-screen__title {
+  margin: 0;
+
+  @include fluid(font-size, 24px, 20px, 28px);
+
+  color: #79345f;
+  font-weight: 800;
+  line-height: 1.4;
+  word-break: keep-all;
+}
+
+.ending-screen__message {
+  margin: 0;
+
+  @include fluid(font-size, 14px, 13px, 16px);
+
+  color: v.$color-text;
+  font-weight: 500;
+  line-height: 1.8;
+  white-space: pre-line;
+  word-break: keep-all;
+}
+
+.ending-screen__button {
+  display: block;
+  width: 100%;
+  max-width: 300px;
+  margin-inline: auto;
+
+  @include vw(padding, 14px 20px);
+  @include vw(border-radius, 15px);
+  @include fluid(font-size, 15px, 14px, 17px);
+
+  border: 0;
+  background: linear-gradient(135deg, #c96ca6, #9474ca);
+  color: #fff;
+  font-weight: 700;
+  line-height: 1.5;
+  cursor: pointer;
+
+  &:hover {
+    filter: brightness(1.06);
+  }
+
+  &:focus-visible {
+    outline: 3px solid #75345c;
+    outline-offset: 4px;
+  }
+}
+
+@media (max-width: 360px) {
+  .ending-screen {
+    @include vw(padding, 16px 12px);
+  }
+
+  .ending-screen__content {
+    @include vw(padding, 16px);
+    @include vw(gap, 12px);
+  }
+}

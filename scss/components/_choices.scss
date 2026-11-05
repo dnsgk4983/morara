@@ -1,0 +1,126 @@
+
+@use "../abstracts/variables" as v;
+@use "../abstracts/mixins" as *;
+
+.choices {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+
+  @include vw(gap, 9px);
+
+  &:empty {
+    display: none;
+  }
+}
+
+.choice,
+.choice-button,
+.choices button {
+  display: block;
+  width: 100%;
+
+  @include vw(padding, 13px 16px);
+  @include vw(border-radius, 15px);
+  @include fluid(font-size, 14px, 13px, 16px);
+
+  border: 1px solid v.$color-border;
+  background: v.$color-surface;
+  color: v.$color-text;
+  font-weight: 600;
+  line-height: 1.5;
+  text-align: left;
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: keep-all;
+  cursor: pointer;
+
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease;
+
+  &:hover:not(:disabled) {
+    border-color: v.$color-primary;
+    background: v.$color-primary-light;
+  }
+
+  &:focus-visible {
+    outline: 2px solid v.$color-primary-dark;
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+}
+
+.freeform {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  min-width: 0;
+
+  @include vw(gap, 8px);
+
+  input {
+    flex: 1 1 0;
+    min-width: 0;
+
+    @include vw(padding, 12px 14px);
+    @include vw(border-radius, 14px);
+    @include fluid(font-size, 14px, 13px, 16px);
+
+    border: 1px solid v.$color-border;
+    outline: none;
+    background: v.$color-surface;
+    color: v.$color-text;
+
+    &::placeholder {
+      color: #b7a7b8;
+    }
+
+    &:focus {
+      border-color: v.$color-primary;
+      box-shadow: 0 0 0 3px rgba(233, 154, 197, 0.12);
+    }
+  }
+
+  button {
+    flex-shrink: 0;
+
+    @include vw(padding, 12px 18px);
+    @include vw(border-radius, 14px);
+    @include fluid(font-size, 14px, 13px, 16px);
+
+    background: v.$color-primary;
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+      background: v.$color-primary-dark;
+    }
+  }
+}
+
+@media (max-width: 360px) {
+  .choices {
+    @include vw(gap, 7px);
+  }
+
+  .choice,
+  .choice-button,
+  .choices button {
+    @include vw(padding, 11px 12px);
+  }
+
+  .freeform {
+    @include vw(gap, 6px);
+
+    button {
+      @include vw(padding, 10px 12px);
+    }
+  }
+}

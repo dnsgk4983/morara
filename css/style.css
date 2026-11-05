@@ -1,187 +1,793 @@
-@charset "UTF-8";
-*, *::before, *::after {
+/* ==========================================
+   Dear Morara
+   Main SCSS Entry Point
+========================================== */
+/* ==========================================
+   Dear Morara - Typography
+========================================== */
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css");
+/* ==========================================
+   Dear Morara - CSS Reset
+========================================== */
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
-html, body {
+html {
   margin: 0;
   padding: 0;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+figure,
+blockquote {
+  margin: 0;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+img,
+svg,
+video {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+:focus-visible {
+  outline: 2px solid #a95b8b;
+  outline-offset: 3px;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ==========================================
+   Dear Morara - Design Tokens
+========================================== */
+/* ==========================================
+   Dear Morara - Common Mixins
+========================================== */
+html {
+  font-size: 16px;
+}
+
+body {
+  font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 16px;
+}
+@media (max-width: 600px) {
+  body {
+    font-size: 14px;
+  }
+}
+@media (min-width: 601px) {
+  body {
+    font-size: 18px;
+  }
+}
+body {
+  font-weight: 400;
+  line-height: 1.6;
+  letter-spacing: -0.02em;
+  color: #3d3040;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.04em;
+}
+
+button,
+input,
+textarea,
+select {
+  font-family: inherit;
+  letter-spacing: inherit;
+}
+
+strong,
+b {
+  font-weight: 700;
+}
+
+small {
+  font-size: 0.8em;
+}
+
+::selection {
+  background: #e99ac5;
+  color: #ffffff;
+}
+
+/* ==========================================
+   Dear Morara - Global Layout
+========================================== */
+html {
   width: 100%;
   height: 100%;
 }
 
-html {
-  font-family: "Pretendard", sans-serif;
-  -webkit-font-smoothing: antialiased;
-}
-
 body {
-  font-family: "Pretendard", sans-serif;
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 1.5;
-  background: #f8e8ed;
-  color: #333333;
-}
-
-button, input, textarea, select {
-  font: inherit;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  background: radial-gradient(circle at 20% 15%, rgba(245, 192, 224, 0.55), transparent 38%), radial-gradient(circle at 80% 85%, rgba(201, 179, 237, 0.45), transparent 42%), #f9f0fa;
+  overflow-x: hidden;
 }
 
 .game {
+  position: relative;
+  display: flex;
+  flex-direction: column;
   width: 100%;
-  max-width: 460px;
+  max-width: 560px;
   height: 100vh;
   height: 100dvh;
+  min-height: 0;
   margin: 0 auto;
-  background: #fff;
-  display: flex;
-  flex-direction: column;
+  background: #fff8fc;
   overflow: hidden;
-  box-shadow: 0 0 35px rgba(0, 0, 0, 0.0705882353);
+  box-shadow: 0 0 60px rgba(98, 52, 104, 0.12);
 }
-
-@media (max-width: 460px) {
+@media (min-width: 601px) {
   .game {
-    max-width: 100%;
-    box-shadow: none;
+    border-left: 1px solid rgba(255, 255, 255, 0.8);
+    border-right: 1px solid rgba(255, 255, 255, 0.8);
   }
 }
-.header {
-  padding: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  background: #fff;
-  border-bottom: 1px solid #eeeeee;
-}
-.header .profile {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 0;
-}
-.header .profile img, .header .profile .avatar {
-  width: 42px;
-  height: 42px;
+
+.header,
+.footer {
   flex-shrink: 0;
-  border-radius: 50%;
-  object-fit: cover;
-  background: #ffb8c8;
-}
-.header .profile strong {
-  display: block;
-  font-size: 15px;
-  font-weight: 600;
-}
-.header .profile small {
-  display: block;
-  margin-top: 4px;
-  color: #65b88d;
-  font-size: 11px;
-}
-.header .right, .header .header-right {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.header .stats {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 5px;
-  font-size: 12px;
-  white-space: nowrap;
-}
-.header #restart, .header .restart-btn {
-  width: 34px;
-  height: 34px;
-  flex-shrink: 0;
-  display: grid;
-  place-items: center;
-  padding: 0;
-  border: 1px solid #eee;
-  border-radius: 50%;
-  background: #fff;
-  color: #888;
-  font-size: 23px;
-  cursor: pointer;
-}
-.header #restart:hover, .header .restart-btn:hover {
-  background: #fff0f4;
-  color: #e87999;
-  border-color: #ffb6c8;
 }
 
 .chat {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding: 20px 14px;
-  background: #fff8fa;
-}
-.chat .message {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  margin-bottom: 18px;
-  animation: appear 0.25s ease;
-}
-.chat .message .avatar, .chat .message .message-avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  object-fit: cover;
-  flex-shrink: 0;
-  background: #ffb8c8;
-}
-.chat .message .content, .chat .message .message-content {
-  min-width: 0;
-  max-width: calc(100% - 44px);
-  display: flex;
-  flex-direction: column;
-}
-.chat .message .name, .chat .message .message-name {
-  font-size: 12px;
-  font-weight: 600;
-  margin-bottom: 6px;
-  color: #555;
-}
-.chat .message .bubble {
-  max-width: 100%;
-  padding: 12px 15px;
-  border-radius: 16px;
-  background: #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.031372549);
-  line-height: 1.6;
-  font-size: 14px;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
-.chat .message .time, .chat .message .message-time {
-  font-size: 10px;
-  color: #999;
-  margin-top: 4px;
-  white-space: nowrap;
-}
-.chat .message .scene, .chat .message .chat-image {
-  display: block;
-  width: min(100%, 260px);
-  border-radius: 12px;
-  object-fit: contain;
-}
-.chat .message.me {
-  justify-content: flex-end;
-}
-.chat .message.me .content, .chat .message.me .message-content {
-  align-items: flex-end;
-}
-.chat .message.me .bubble {
-  background: #ffd5df;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #e7c7de transparent;
 }
 
-@keyframes appear {
+.chat::-webkit-scrollbar {
+  width: 5px;
+}
+
+.chat::-webkit-scrollbar-thumb {
+  background: #e7c7de;
+  border-radius: 999px;
+}
+
+.chat::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+input,
+textarea {
+  min-width: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
+}
+/* ==========================================
+   Dear Morara - Buttons
+========================================== */
+button {
+  border: 0;
+  background: none;
+  color: inherit;
+  transition: background-color 200ms ease, border-color 200ms ease, box-shadow 200ms ease, opacity 200ms ease, transform 200ms ease;
+}
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+button:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+#restart {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+@media (max-width: 560px) {
+  #restart {
+    width: 8.8372093023vw;
+  }
+}
+@media (min-width: 561px) {
+  #restart {
+    width: 38px;
+  }
+}
+@media (max-width: 560px) {
+  #restart {
+    height: 8.8372093023vw;
+  }
+}
+@media (min-width: 561px) {
+  #restart {
+    height: 38px;
+  }
+}
+@media (max-width: 560px) {
+  #restart {
+    border-radius: 2.7906976744vw;
+  }
+}
+@media (min-width: 561px) {
+  #restart {
+    border-radius: 12px;
+  }
+}
+#restart {
+  font-size: 22px;
+}
+@media (max-width: 600px) {
+  #restart {
+    font-size: 18px;
+  }
+}
+@media (min-width: 601px) {
+  #restart {
+    font-size: 24px;
+  }
+}
+#restart {
+  background: #fff0f8;
+  color: #a95b8b;
+}
+#restart:hover:not(:disabled) {
+  background: #f7d9ea;
+}
+
+.next-day-button,
+.next-day,
+#next-day {
+  display: block;
+  width: 100%;
+}
+@media (max-width: 560px) {
+  .next-day-button,
+  .next-day,
+  #next-day {
+    padding: 3.2558139535vw 4.6511627907vw;
+  }
+}
+@media (min-width: 561px) {
+  .next-day-button,
+  .next-day,
+  #next-day {
+    padding: 14px 20px;
+  }
+}
+@media (max-width: 560px) {
+  .next-day-button,
+  .next-day,
+  #next-day {
+    border-radius: 3.7209302326vw;
+  }
+}
+@media (min-width: 561px) {
+  .next-day-button,
+  .next-day,
+  #next-day {
+    border-radius: 16px;
+  }
+}
+.next-day-button,
+.next-day,
+#next-day {
+  font-size: 15px;
+}
+@media (max-width: 600px) {
+  .next-day-button,
+  .next-day,
+  #next-day {
+    font-size: 14px;
+  }
+}
+@media (min-width: 601px) {
+  .next-day-button,
+  .next-day,
+  #next-day {
+    font-size: 17px;
+  }
+}
+.next-day-button,
+.next-day,
+#next-day {
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.5;
+  background: linear-gradient(135deg, #e99ac5, #c9b3ed);
+  color: #ffffff;
+  box-shadow: 0 6px 18px rgba(169, 91, 139, 0.18);
+}
+.next-day-button:hover:not(:disabled),
+.next-day:hover:not(:disabled),
+#next-day:hover:not(:disabled) {
+  filter: brightness(1.04);
+}
+
+@media (max-width: 360px) {
+  #restart {
+    min-width: 32px;
+    min-height: 32px;
+  }
+  .next-day-button,
+  .next-day,
+  #next-day {
+    min-height: 44px;
+  }
+}
+/* ==========================================
+   Dear Morara - Profile
+========================================== */
+.profile {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+@media (max-width: 560px) {
+  .profile {
+    gap: 2.5581395349vw;
+  }
+}
+@media (min-width: 561px) {
+  .profile {
+    gap: 11px;
+  }
+}
+.profile img {
+  display: block;
+  flex-shrink: 0;
+}
+@media (max-width: 560px) {
+  .profile img {
+    width: 10.6976744186vw;
+  }
+}
+@media (min-width: 561px) {
+  .profile img {
+    width: 46px;
+  }
+}
+@media (max-width: 560px) {
+  .profile img {
+    height: 10.6976744186vw;
+  }
+}
+@media (min-width: 561px) {
+  .profile img {
+    height: 46px;
+  }
+}
+@media (max-width: 560px) {
+  .profile img {
+    border-radius: 50%;
+  }
+}
+@media (min-width: 561px) {
+  .profile img {
+    border-radius: 50%;
+  }
+}
+.profile img {
+  object-fit: cover;
+  object-position: center;
+  background: #f8ddeb;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 10px rgba(169, 91, 139, 0.15);
+}
+.profile > div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex: 1;
+  min-width: 0;
+}
+.profile strong {
+  display: block;
+  font-size: 16px;
+}
+@media (max-width: 600px) {
+  .profile strong {
+    font-size: 14px;
+  }
+}
+@media (min-width: 601px) {
+  .profile strong {
+    font-size: 18px;
+  }
+}
+.profile strong {
+  font-weight: 750;
+  line-height: 1.4;
+  color: #3d3040;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.profile small {
+  display: block;
+  font-size: 11px;
+}
+@media (max-width: 600px) {
+  .profile small {
+    font-size: 10px;
+  }
+}
+@media (min-width: 601px) {
+  .profile small {
+    font-size: 12px;
+  }
+}
+.profile small {
+  font-weight: 500;
+  line-height: 1.5;
+  color: #8f7e91;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 360px) and (max-width: 560px) {
+  .profile {
+    gap: 1.8604651163vw;
+  }
+}
+@media (max-width: 360px) and (min-width: 561px) {
+  .profile {
+    gap: 8px;
+  }
+}
+@media (max-width: 360px) and (max-width: 560px) {
+  .profile img {
+    width: 9.3023255814vw;
+  }
+}
+@media (max-width: 360px) and (min-width: 561px) {
+  .profile img {
+    width: 40px;
+  }
+}
+@media (max-width: 360px) and (max-width: 560px) {
+  .profile img {
+    height: 9.3023255814vw;
+  }
+}
+@media (max-width: 360px) and (min-width: 561px) {
+  .profile img {
+    height: 40px;
+  }
+}
+/* ==========================================
+   Dear Morara - Chat Messages
+========================================== */
+.message,
+.msg {
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+  min-width: 0;
+  flex-shrink: 0;
+}
+@media (max-width: 560px) {
+  .message,
+  .msg {
+    gap: 2.0930232558vw;
+  }
+}
+@media (min-width: 561px) {
+  .message,
+  .msg {
+    gap: 9px;
+  }
+}
+@media (max-width: 560px) {
+  .message,
+  .msg {
+    margin-bottom: 2.7906976744vw;
+  }
+}
+@media (min-width: 561px) {
+  .message,
+  .msg {
+    margin-bottom: 12px;
+  }
+}
+.message,
+.msg {
+  animation: message-appear 300ms ease both;
+}
+.message.morara, .message.message--morara, .message.msg--morara,
+.msg.morara,
+.msg.message--morara,
+.msg.msg--morara {
+  justify-content: flex-start;
+}
+.message.me, .message.user, .message.message--me, .message.message--user, .message.msg--me, .message.msg--user,
+.msg.me,
+.msg.user,
+.msg.message--me,
+.msg.message--user,
+.msg.msg--me,
+.msg.msg--user {
+  justify-content: flex-end;
+}
+
+.message-content,
+.msg__content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+  max-width: 80%;
+}
+
+.message.me .message-content,
+.message.user .message-content,
+.msg--me .msg__content,
+.msg--user .msg__content {
+  align-items: flex-end;
+}
+
+.bubble,
+.msg__bubble {
+  display: block;
+  flex: 0 1 auto;
+  width: fit-content;
+  max-width: 100%;
+  min-width: 0;
+}
+@media (max-width: 560px) {
+  .bubble,
+  .msg__bubble {
+    padding: 2.7906976744vw 3.488372093vw;
+  }
+}
+@media (min-width: 561px) {
+  .bubble,
+  .msg__bubble {
+    padding: 12px 15px;
+  }
+}
+@media (max-width: 560px) {
+  .bubble,
+  .msg__bubble {
+    border-radius: 4.1860465116vw;
+  }
+}
+@media (min-width: 561px) {
+  .bubble,
+  .msg__bubble {
+    border-radius: 18px;
+  }
+}
+.bubble,
+.msg__bubble {
+  font-size: 15px;
+}
+@media (max-width: 600px) {
+  .bubble,
+  .msg__bubble {
+    font-size: 14px;
+  }
+}
+@media (min-width: 601px) {
+  .bubble,
+  .msg__bubble {
+    font-size: 16px;
+  }
+}
+.bubble,
+.msg__bubble {
+  line-height: 1.6;
+  font-weight: 400;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  word-break: keep-all;
+  background: #ffffff;
+  color: #3d3040;
+  box-shadow: 0 3px 12px rgba(91, 47, 88, 0.06);
+}
+
+.message.morara .bubble,
+.message--morara .bubble,
+.msg--morara .msg__bubble {
+  background: #ffffff;
+  border-bottom-left-radius: 5px;
+}
+
+.message.me .bubble,
+.message.user .bubble,
+.message--me .bubble,
+.message--user .bubble,
+.msg--me .msg__bubble,
+.msg--user .msg__bubble {
+  background: #f7cce4;
+  border-bottom-right-radius: 5px;
+}
+
+.message-avatar,
+.avatar,
+.msg__avatar {
+  display: block;
+  flex-shrink: 0;
+}
+@media (max-width: 560px) {
+  .message-avatar,
+  .avatar,
+  .msg__avatar {
+    width: 7.9069767442vw;
+  }
+}
+@media (min-width: 561px) {
+  .message-avatar,
+  .avatar,
+  .msg__avatar {
+    width: 34px;
+  }
+}
+@media (max-width: 560px) {
+  .message-avatar,
+  .avatar,
+  .msg__avatar {
+    height: 7.9069767442vw;
+  }
+}
+@media (min-width: 561px) {
+  .message-avatar,
+  .avatar,
+  .msg__avatar {
+    height: 34px;
+  }
+}
+.message-avatar,
+.avatar,
+.msg__avatar {
+  border-radius: 50%;
+  object-fit: cover;
+  background: #f4d7e8;
+}
+
+.message-time,
+.time,
+.msg__time {
+  display: block;
+  flex-shrink: 0;
+  margin-top: 6px;
+  font-size: 10px;
+  line-height: 1.4;
+  color: #8f7e91;
+  white-space: nowrap;
+}
+
+.message-image,
+.chat-image,
+.msg__image {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+@media (max-width: 560px) {
+  .message-image,
+  .chat-image,
+  .msg__image {
+    border-radius: 3.7209302326vw;
+  }
+}
+@media (min-width: 561px) {
+  .message-image,
+  .chat-image,
+  .msg__image {
+    border-radius: 16px;
+  }
+}
+.message-image,
+.chat-image,
+.msg__image {
+  box-shadow: 0 4px 16px rgba(91, 47, 88, 0.12);
+}
+
+.typing {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.typing span,
+.typing i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #a95b8b;
+  animation: typing-bounce 1100ms ease-in-out infinite;
+}
+.typing span:nth-child(2),
+.typing i:nth-child(2) {
+  animation-delay: 150ms;
+}
+.typing span:nth-child(3),
+.typing i:nth-child(3) {
+  animation-delay: 300ms;
+}
+
+@keyframes message-appear {
   from {
     opacity: 0;
     transform: translateY(8px);
@@ -191,696 +797,1483 @@ button, input, textarea, select {
     transform: translateY(0);
   }
 }
-/* 채팅 상황 이미지 */
-.message-content {
-  min-width: 0;
-  max-width: 100%;
-}
-
-.chat-image {
-  display: block;
-  width: auto;
-  max-width: min(100%, 280px);
-  max-height: 220px;
-  height: auto;
-  object-fit: contain;
-  border-radius: 12px;
-}
-
-/* 모바일 화면 */
-@media (max-width: 480px) {
-  .chat-image {
-    max-width: min(100%, 240px);
-    max-height: 180px;
-  }
-}
-/* 새 메시지 등장 효과 */
-.message {
-  animation: message-appear 0.35s ease-out both;
-}
-
-@keyframes message-appear {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
+@keyframes typing-bounce {
+  0%, 60%, 100% {
+    opacity: 0.4;
     transform: translateY(0);
   }
-}
-/* 기존 기록 복원 시 애니메이션 방지 */
-.message.is-restored {
-  animation: none;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .message {
-    animation: none;
-  }
-}
-/* ========================================
-   채팅 입력 중 애니메이션
-======================================== */
-.bubble.is-typing {
-  color: #c78aa9;
-  letter-spacing: 4px;
-  animation: typing-pulse 1s ease-in-out infinite;
-}
-
-@keyframes typing-pulse {
-  0%, 100% {
-    opacity: 0.4;
-  }
-  50% {
+  30% {
     opacity: 1;
+    transform: translateY(-5px);
   }
 }
-@media (prefers-reduced-motion: reduce) {
-  .bubble.is-typing {
-    animation: none;
-  }
-}
-.footer {
-  padding: 14px;
-  border-top: 1px solid #eeeeee;
-  background: #fff;
-}
-.footer .choices {
-  display: grid;
-  gap: 8px;
-}
-.footer .choice {
+.choices {
+  display: flex;
+  flex-direction: column;
   width: 100%;
-  padding: 12px;
-  border: 1px solid #ffb6c8;
-  background: #fff;
-  border-radius: 12px;
-  cursor: pointer;
-  font-size: 13px;
+  min-width: 0;
+}
+@media (max-width: 560px) {
+  .choices {
+    gap: 2.0930232558vw;
+  }
+}
+@media (min-width: 561px) {
+  .choices {
+    gap: 9px;
+  }
+}
+.choices:empty {
+  display: none;
+}
+
+.choice,
+.choice-button,
+.choices button {
+  display: block;
+  width: 100%;
+}
+@media (max-width: 560px) {
+  .choice,
+  .choice-button,
+  .choices button {
+    padding: 3.023255814vw 3.7209302326vw;
+  }
+}
+@media (min-width: 561px) {
+  .choice,
+  .choice-button,
+  .choices button {
+    padding: 13px 16px;
+  }
+}
+@media (max-width: 560px) {
+  .choice,
+  .choice-button,
+  .choices button {
+    border-radius: 3.488372093vw;
+  }
+}
+@media (min-width: 561px) {
+  .choice,
+  .choice-button,
+  .choices button {
+    border-radius: 15px;
+  }
+}
+.choice,
+.choice-button,
+.choices button {
+  font-size: 14px;
+}
+@media (max-width: 600px) {
+  .choice,
+  .choice-button,
+  .choices button {
+    font-size: 13px;
+  }
+}
+@media (min-width: 601px) {
+  .choice,
+  .choice-button,
+  .choices button {
+    font-size: 16px;
+  }
+}
+.choice,
+.choice-button,
+.choices button {
+  border: 1px solid #f0dce9;
+  background: #ffffff;
+  color: #3d3040;
+  font-weight: 600;
+  line-height: 1.5;
   text-align: left;
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: keep-all;
+  cursor: pointer;
+  transition: background-color 150ms ease, border-color 150ms ease;
 }
-.footer .choice:hover:not(:disabled) {
-  background: #fff0f4;
+.choice:hover:not(:disabled),
+.choice-button:hover:not(:disabled),
+.choices button:hover:not(:disabled) {
+  border-color: #e99ac5;
+  background: #fff0f8;
 }
-.footer .choice:disabled {
+.choice:focus-visible,
+.choice-button:focus-visible,
+.choices button:focus-visible {
+  outline: 2px solid #a95b8b;
+  outline-offset: 2px;
+}
+.choice:disabled,
+.choice-button:disabled,
+.choices button:disabled {
   opacity: 0.5;
   cursor: default;
 }
-.footer .freeform {
+
+.freeform {
   display: flex;
-  gap: 8px;
-  margin-top: 8px;
-}
-.footer .freeform[hidden] {
-  display: none;
-}
-.footer .freeform input {
-  flex: 1;
+  align-items: stretch;
+  width: 100%;
   min-width: 0;
-  padding: 12px;
-  border: 1px solid #ffb6c8;
-  border-radius: 12px;
+}
+@media (max-width: 560px) {
+  .freeform {
+    gap: 1.8604651163vw;
+  }
+}
+@media (min-width: 561px) {
+  .freeform {
+    gap: 8px;
+  }
+}
+.freeform input {
+  flex: 1 1 0;
+  min-width: 0;
+}
+@media (max-width: 560px) {
+  .freeform input {
+    padding: 2.7906976744vw 3.2558139535vw;
+  }
+}
+@media (min-width: 561px) {
+  .freeform input {
+    padding: 12px 14px;
+  }
+}
+@media (max-width: 560px) {
+  .freeform input {
+    border-radius: 3.2558139535vw;
+  }
+}
+@media (min-width: 561px) {
+  .freeform input {
+    border-radius: 14px;
+  }
+}
+.freeform input {
+  font-size: 14px;
+}
+@media (max-width: 600px) {
+  .freeform input {
+    font-size: 13px;
+  }
+}
+@media (min-width: 601px) {
+  .freeform input {
+    font-size: 16px;
+  }
+}
+.freeform input {
+  border: 1px solid #f0dce9;
   outline: none;
-  background: #fff8fa;
+  background: #ffffff;
+  color: #3d3040;
 }
-.footer .freeform input:focus {
-  border-color: #ffa4a4;
+.freeform input::placeholder {
+  color: #b7a7b8;
 }
-.footer .freeform button {
-  border: 0;
-  border-radius: 12px;
-  background: #ffa4a4;
-  color: #4b2630;
-  padding: 0 15px;
+.freeform input:focus {
+  border-color: #e99ac5;
+  box-shadow: 0 0 0 3px rgba(233, 154, 197, 0.12);
+}
+.freeform button {
+  flex-shrink: 0;
+}
+@media (max-width: 560px) {
+  .freeform button {
+    padding: 2.7906976744vw 4.1860465116vw;
+  }
+}
+@media (min-width: 561px) {
+  .freeform button {
+    padding: 12px 18px;
+  }
+}
+@media (max-width: 560px) {
+  .freeform button {
+    border-radius: 3.2558139535vw;
+  }
+}
+@media (min-width: 561px) {
+  .freeform button {
+    border-radius: 14px;
+  }
+}
+.freeform button {
+  font-size: 14px;
+}
+@media (max-width: 600px) {
+  .freeform button {
+    font-size: 13px;
+  }
+}
+@media (min-width: 601px) {
+  .freeform button {
+    font-size: 16px;
+  }
+}
+.freeform button {
+  background: #e99ac5;
+  color: #fff;
+  font-weight: 700;
   cursor: pointer;
 }
-.footer .status {
-  margin-top: 10px;
-  color: #999;
+.freeform button:hover:not(:disabled) {
+  background: #a95b8b;
+}
+
+@media (max-width: 360px) and (max-width: 560px) {
+  .choices {
+    gap: 1.6279069767vw;
+  }
+}
+@media (max-width: 360px) and (min-width: 561px) {
+  .choices {
+    gap: 7px;
+  }
+}
+@media (max-width: 360px) and (max-width: 560px) {
+  .choice,
+  .choice-button,
+  .choices button {
+    padding: 2.5581395349vw 2.7906976744vw;
+  }
+}
+@media (max-width: 360px) and (min-width: 561px) {
+  .choice,
+  .choice-button,
+  .choices button {
+    padding: 11px 12px;
+  }
+}
+@media (max-width: 360px) and (max-width: 560px) {
+  .freeform {
+    gap: 1.3953488372vw;
+  }
+}
+@media (max-width: 360px) and (min-width: 561px) {
+  .freeform {
+    gap: 6px;
+  }
+}
+@media (max-width: 360px) and (max-width: 560px) {
+  .freeform button {
+    padding: 2.3255813953vw 2.7906976744vw;
+  }
+}
+@media (max-width: 360px) and (min-width: 561px) {
+  .freeform button {
+    padding: 10px 12px;
+  }
+}
+/* ==========================================
+   Dear Morara - Header
+========================================== */
+.header {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  width: 100%;
+  min-width: 0;
+}
+@media (max-width: 560px) {
+  .header {
+    gap: 2.3255813953vw;
+  }
+}
+@media (min-width: 561px) {
+  .header {
+    gap: 10px;
+  }
+}
+@media (max-width: 560px) {
+  .header {
+    padding: 3.2558139535vw 4.1860465116vw;
+  }
+}
+@media (min-width: 561px) {
+  .header {
+    padding: 14px 18px;
+  }
+}
+.header {
+  background: rgba(255, 255, 255, 0.94);
+  border-bottom: 1px solid #f0dce9;
+  box-shadow: 0 3px 16px rgba(112, 64, 103, 0.04);
+}
+.header .profile {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.header .right {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+}
+@media (max-width: 560px) {
+  .header .right {
+    gap: 2.3255813953vw;
+  }
+}
+@media (min-width: 561px) {
+  .header .right {
+    gap: 10px;
+  }
+}
+.header .stats {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+}
+@media (max-width: 560px) {
+  .header .stats {
+    gap: 0.6976744186vw;
+  }
+}
+@media (min-width: 561px) {
+  .header .stats {
+    gap: 3px;
+  }
+}
+.header .stats span {
+  display: block;
   font-size: 11px;
+}
+@media (max-width: 600px) {
+  .header .stats span {
+    font-size: 10px;
+  }
+}
+@media (min-width: 601px) {
+  .header .stats span {
+    font-size: 13px;
+  }
+}
+.header .stats span {
+  font-weight: 700;
+  line-height: 1.4;
+  white-space: nowrap;
+  color: #8f7e91;
+}
+.header .stats #day {
+  color: #a95b8b;
+}
+.header .stats #affection {
+  color: #d36e9f;
+}
+.header #restart {
+  flex-shrink: 0;
+}
+
+@media (max-width: 360px) and (max-width: 560px) {
+  .header {
+    gap: 1.3953488372vw;
+  }
+}
+@media (max-width: 360px) and (min-width: 561px) {
+  .header {
+    gap: 6px;
+  }
+}
+@media (max-width: 360px) and (max-width: 560px) {
+  .header {
+    padding: 2.7906976744vw 2.3255813953vw;
+  }
+}
+@media (max-width: 360px) and (min-width: 561px) {
+  .header {
+    padding: 12px 10px;
+  }
+}
+@media (max-width: 360px) and (max-width: 560px) {
+  .header .right {
+    gap: 1.3953488372vw;
+  }
+}
+@media (max-width: 360px) and (min-width: 561px) {
+  .header .right {
+    gap: 6px;
+  }
+}
+@media (max-width: 360px) and (max-width: 560px) {
+  .header .stats {
+    gap: 0.4651162791vw;
+  }
+}
+@media (max-width: 360px) and (min-width: 561px) {
+  .header .stats {
+    gap: 2px;
+  }
+}
+/* ==========================================
+   Dear Morara - Chat Layout
+========================================== */
+.chat {
+  position: relative;
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+@media (max-width: 560px) {
+  .chat {
+    padding: 3.7209302326vw;
+  }
+}
+@media (min-width: 561px) {
+  .chat {
+    padding: 16px;
+  }
+}
+@media (max-width: 560px) {
+  .chat {
+    gap: 2.7906976744vw;
+  }
+}
+@media (min-width: 561px) {
+  .chat {
+    gap: 12px;
+  }
+}
+.chat {
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  background: radial-gradient(circle at 15% 10%, rgba(255, 219, 239, 0.42), transparent 35%), radial-gradient(circle at 90% 85%, rgba(219, 204, 247, 0.35), transparent 40%), #fff8fc;
+  scroll-behavior: smooth;
+}
+.chat > * {
+  flex-shrink: 0;
+}
+.chat .system-message,
+.chat .day-divider {
+  align-self: center;
+  max-width: 90%;
+}
+@media (max-width: 560px) {
+  .chat .system-message,
+  .chat .day-divider {
+    padding: 1.6279069767vw 3.2558139535vw;
+  }
+}
+@media (min-width: 561px) {
+  .chat .system-message,
+  .chat .day-divider {
+    padding: 7px 14px;
+  }
+}
+@media (max-width: 560px) {
+  .chat .system-message,
+  .chat .day-divider {
+    border-radius: 232.3255813953vw;
+  }
+}
+@media (min-width: 561px) {
+  .chat .system-message,
+  .chat .day-divider {
+    border-radius: 999px;
+  }
+}
+.chat .system-message,
+.chat .day-divider {
+  font-size: 12px;
+}
+@media (max-width: 600px) {
+  .chat .system-message,
+  .chat .day-divider {
+    font-size: 11px;
+  }
+}
+@media (min-width: 601px) {
+  .chat .system-message,
+  .chat .day-divider {
+    font-size: 13px;
+  }
+}
+.chat .system-message,
+.chat .day-divider {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid #f0dce9;
+  color: #8f7e91;
+  font-weight: 600;
+  line-height: 1.5;
   text-align: center;
 }
 
-/* ========================================
-   Dear Morara - Letter Splash
-======================================== */
+@media (max-width: 360px) and (max-width: 560px) {
+  .chat {
+    padding: 2.7906976744vw;
+  }
+}
+@media (max-width: 360px) and (min-width: 561px) {
+  .chat {
+    padding: 12px;
+  }
+}
+@media (max-width: 360px) and (max-width: 560px) {
+  .chat {
+    gap: 2.3255813953vw;
+  }
+}
+@media (max-width: 360px) and (min-width: 561px) {
+  .chat {
+    gap: 10px;
+  }
+}
+.footer {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  max-height: 55%;
+  overflow: hidden;
+}
+@media (max-width: 560px) {
+  .footer {
+    gap: 2.3255813953vw;
+  }
+}
+@media (min-width: 561px) {
+  .footer {
+    gap: 10px;
+  }
+}
+@media (max-width: 560px) {
+  .footer {
+    padding: 3.2558139535vw 3.7209302326vw 4.1860465116vw;
+  }
+}
+@media (min-width: 561px) {
+  .footer {
+    padding: 14px 16px 18px;
+  }
+}
+.footer {
+  padding-bottom: max(18px, env(safe-area-inset-bottom));
+  background: rgba(255, 255, 255, 0.96);
+  border-top: 1px solid #f0dce9;
+  box-shadow: 0 -5px 20px rgba(112, 64, 103, 0.06);
+}
+.footer .choices {
+  flex: 0 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #e7c7de transparent;
+}
+.footer .choices::-webkit-scrollbar {
+  width: 4px;
+}
+.footer .choices::-webkit-scrollbar-thumb {
+  background: #e7c7de;
+  border-radius: 4px;
+}
+.footer .freeform {
+  flex-shrink: 0;
+}
+.footer .status {
+  flex-shrink: 0;
+  min-width: 0;
+  font-size: 11px;
+}
+@media (max-width: 600px) {
+  .footer .status {
+    font-size: 10px;
+  }
+}
+@media (min-width: 601px) {
+  .footer .status {
+    font-size: 12px;
+  }
+}
+.footer .status {
+  line-height: 1.5;
+  text-align: center;
+  color: #8f7e91;
+  overflow-wrap: break-word;
+}
+.footer .status:empty {
+  display: none;
+}
+
+@media (max-width: 360px) {
+  .footer {
+    padding-bottom: max(14px, env(safe-area-inset-bottom));
+  }
+}
+@media (max-width: 360px) and (max-width: 560px) {
+  .footer {
+    gap: 1.8604651163vw;
+  }
+}
+@media (max-width: 360px) and (min-width: 561px) {
+  .footer {
+    gap: 8px;
+  }
+}
+@media (max-width: 360px) and (max-width: 560px) {
+  .footer {
+    padding: 2.3255813953vw 2.3255813953vw 3.2558139535vw;
+  }
+}
+@media (max-width: 360px) and (min-width: 561px) {
+  .footer {
+    padding: 10px 10px 14px;
+  }
+}
+@media (max-height: 600px) {
+  .footer {
+    max-height: 60%;
+  }
+}
 .splash {
   position: fixed;
   inset: 0;
-  z-index: 9999;
+  z-index: 1000;
+  overflow: hidden;
+  background: #191525;
+}
+.splash[hidden], .splash.is-hidden {
+  display: none;
+}
+.splash.is-fading {
+  animation: splash-fade-out 1000ms ease forwards;
+  pointer-events: none;
+}
+
+.splash__scene {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  max-width: 560px;
+  height: 100%;
+  margin-inline: auto;
+  overflow: hidden;
+  background: #fff0f8;
+  --scene-width: min(100vw, 560px);
+}
+.splash__scene::before, .splash__scene::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+.splash__scene::before {
+  top: 0;
+  height: 22%;
+  background: linear-gradient(to bottom, rgba(255, 241, 250, 0.5), transparent);
+}
+.splash__scene::after {
+  bottom: 0;
+  height: 28%;
+  background: linear-gradient(to top, rgba(255, 242, 250, 0.75), transparent);
+}
+
+.splash__art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  pointer-events: none;
+  user-select: none;
+}
+
+.splash__target {
+  position: absolute;
+  z-index: 2;
+}
+@media (max-width: 560px) {
+  .splash__target {
+    top: 38.1395348837vw;
+  }
+}
+@media (min-width: 561px) {
+  .splash__target {
+    top: 213.5813953488px;
+  }
+}
+@media (max-width: 560px) {
+  .splash__target {
+    left: 50vw;
+  }
+}
+@media (min-width: 561px) {
+  .splash__target {
+    left: 280px;
+  }
+}
+@media (max-width: 560px) {
+  .splash__target {
+    width: 30.2325581395vw;
+  }
+}
+@media (min-width: 561px) {
+  .splash__target {
+    width: 169.3023255814px;
+  }
+}
+@media (max-width: 560px) {
+  .splash__target {
+    height: 30.2325581395vw;
+  }
+}
+@media (min-width: 561px) {
+  .splash__target {
+    height: 169.3023255814px;
+  }
+}
+.splash__target {
+  transform: translateX(-50%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.splash__crown {
+  position: absolute;
+  z-index: 5;
+}
+@media (max-width: 560px) {
+  .splash__crown {
+    top: 138.6046511628vw;
+  }
+}
+@media (min-width: 561px) {
+  .splash__crown {
+    top: 776.1860465116px;
+  }
+}
+@media (max-width: 560px) {
+  .splash__crown {
+    left: 50vw;
+  }
+}
+@media (min-width: 561px) {
+  .splash__crown {
+    left: 280px;
+  }
+}
+@media (max-width: 560px) {
+  .splash__crown {
+    width: 41.8604651163vw;
+  }
+}
+@media (min-width: 561px) {
+  .splash__crown {
+    width: 234.4186046512px;
+  }
+}
+.splash__crown {
+  height: auto;
+  transform: translateX(-50%);
+  object-fit: contain;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  filter: drop-shadow(0 6px 16px rgba(82, 34, 74, 0.25));
+  transition: top 650ms cubic-bezier(0.22, 1, 0.36, 1), left 650ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.splash__crown:active {
+  cursor: grabbing;
+}
+.splash__crown:focus-visible {
+  outline: 3px solid #8a477a;
+  outline-offset: 5px;
+}
+.splash__crown.is-dragging {
+  z-index: 20;
+  transition: none;
+}
+.splash__crown.is-placed {
+  z-index: 6;
+}
+@media (max-width: 560px) {
+  .splash__crown.is-placed {
+    top: 38.1395348837vw;
+  }
+}
+@media (min-width: 561px) {
+  .splash__crown.is-placed {
+    top: 213.5813953488px;
+  }
+}
+@media (max-width: 560px) {
+  .splash__crown.is-placed {
+    left: 50vw;
+  }
+}
+@media (min-width: 561px) {
+  .splash__crown.is-placed {
+    left: 280px;
+  }
+}
+.splash__crown.is-placed {
+  pointer-events: none;
+  cursor: default;
+}
+
+.splash__sparkles {
+  position: absolute;
+  z-index: 7;
+}
+@media (max-width: 560px) {
+  .splash__sparkles {
+    top: 38.1395348837vw;
+  }
+}
+@media (min-width: 561px) {
+  .splash__sparkles {
+    top: 213.5813953488px;
+  }
+}
+@media (max-width: 560px) {
+  .splash__sparkles {
+    left: 50vw;
+  }
+}
+@media (min-width: 561px) {
+  .splash__sparkles {
+    left: 280px;
+  }
+}
+@media (max-width: 560px) {
+  .splash__sparkles {
+    width: 41.8604651163vw;
+  }
+}
+@media (min-width: 561px) {
+  .splash__sparkles {
+    width: 234.4186046512px;
+  }
+}
+@media (max-width: 560px) {
+  .splash__sparkles {
+    height: 41.8604651163vw;
+  }
+}
+@media (min-width: 561px) {
+  .splash__sparkles {
+    height: 234.4186046512px;
+  }
+}
+.splash__sparkles {
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  pointer-events: none;
+}
+.is-crowned .splash__sparkles {
+  animation: splash-sparkle 1200ms ease-out forwards;
+}
+.splash__sparkles span {
+  position: absolute;
+  font-size: 24px;
+}
+@media (max-width: 600px) {
+  .splash__sparkles span {
+    font-size: 18px;
+  }
+}
+@media (min-width: 601px) {
+  .splash__sparkles span {
+    font-size: 30px;
+  }
+}
+.splash__sparkles span {
+  color: #fff0a8;
+  text-shadow: 0 0 14px rgba(255, 237, 153, 0.9);
+}
+.splash__sparkles span:nth-child(1) {
+  top: 0;
+  left: 50%;
+}
+.splash__sparkles span:nth-child(2) {
+  top: 25%;
+  right: 0;
+}
+.splash__sparkles span:nth-child(3) {
+  bottom: 0;
+  right: 20%;
+}
+.splash__sparkles span:nth-child(4) {
+  bottom: 15%;
+  left: 0;
+}
+.splash__sparkles span:nth-child(5) {
+  top: 20%;
+  left: 10%;
+}
+
+.splash__content {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+@media (max-width: 560px) {
+  .splash__content {
+    padding: 9.3023255814vw 4.6511627907vw 5.5813953488vw;
+  }
+}
+@media (min-width: 561px) {
+  .splash__content {
+    padding: 40px 20px 24px;
+  }
+}
+.splash__content {
+  text-align: center;
+  pointer-events: none;
+}
+
+.splash__eyebrow {
+  margin: 0;
+  font-size: 12px;
+}
+@media (max-width: 600px) {
+  .splash__eyebrow {
+    font-size: 11px;
+  }
+}
+@media (min-width: 601px) {
+  .splash__eyebrow {
+    font-size: 14px;
+  }
+}
+.splash__eyebrow {
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  line-height: 1.5;
+  color: #8c4776;
+}
+
+@media (max-width: 560px) {
+  .splash__title {
+    margin: 1.8604651163vw 0vw 0.9302325581vw;
+  }
+}
+@media (min-width: 561px) {
+  .splash__title {
+    margin: 8px 0 4px;
+  }
+}
+.splash__title {
+  font-size: 38px;
+}
+@media (max-width: 600px) {
+  .splash__title {
+    font-size: 30px;
+  }
+}
+@media (min-width: 601px) {
+  .splash__title {
+    font-size: 46px;
+  }
+}
+.splash__title {
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.05em;
+  color: #79345f;
+  text-shadow: 0 2px 8px rgba(255, 255, 255, 0.9);
+}
+
+.splash__subtitle {
+  margin: 0;
+  font-size: 15px;
+}
+@media (max-width: 600px) {
+  .splash__subtitle {
+    font-size: 13px;
+  }
+}
+@media (min-width: 601px) {
+  .splash__subtitle {
+    font-size: 18px;
+  }
+}
+.splash__subtitle {
+  font-weight: 600;
+  line-height: 1.6;
+  color: #87476f;
+  text-shadow: 0 1px 4px rgba(255, 255, 255, 0.8);
+}
+
+.splash__actions {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.splash__hint {
+  position: absolute;
+  top: 76%;
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding-inline: 20px;
+  font-size: 16px;
+}
+@media (max-width: 600px) {
+  .splash__hint {
+    font-size: 14px;
+  }
+}
+@media (min-width: 601px) {
+  .splash__hint {
+    font-size: 18px;
+  }
+}
+.splash__hint {
+  font-weight: 800;
+  line-height: 1.5;
+  text-align: center;
+  word-break: keep-all;
+  color: #652b50;
+  text-shadow: 0 1px 8px rgba(255, 255, 255, 0.95);
+}
+.splash__hint[hidden] {
+  display: none;
+}
+.splash__hint.is-celebrating {
+  font-size: 18px;
+}
+@media (max-width: 600px) {
+  .splash__hint.is-celebrating {
+    font-size: 16px;
+  }
+}
+@media (min-width: 601px) {
+  .splash__hint.is-celebrating {
+    font-size: 21px;
+  }
+}
+.splash__hint.is-celebrating {
+  color: #75345c;
+  animation: splash-celebrate-in 700ms ease-out both;
+}
+
+.splash__start {
+  position: absolute;
+  top: calc(76% + 48px);
+  left: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100dvh;
-  overflow-y: auto;
-  padding: 32px 20px;
-  background: #191525;
-  color: #ffe4f0;
-  font-family: "Pretendard", sans-serif;
-  transition: opacity 0.7s ease, visibility 0.7s ease;
-}
-.splash.is-hidden {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-}
-.splash__background {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: radial-gradient(circle at 50% 42%, rgba(239, 143, 194, 0.17), transparent 52%), radial-gradient(circle at 80% 80%, rgba(137, 105, 178, 0.13), transparent 40%);
-}
-.splash__content {
-  position: relative;
-  z-index: 1;
-  width: min(100%, 480px);
-  margin: auto;
-  text-align: center;
-}
-.splash__eyebrow {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.32em;
-  color: #f2b6d6;
-}
-.splash__title {
-  margin: 16px 0 8px;
-  font-size: clamp(38px, 8vw, 58px);
-  font-weight: 700;
-  letter-spacing: -0.04em;
-}
-.splash__subtitle {
+  width: min(100% - 40px, 300px);
   margin: 0;
-  font-size: 14px;
-  color: #d7b8cc;
 }
-.splash__hint {
-  margin-top: 34px;
-  font-size: 12px;
-  color: #bba6bd;
-  transition: opacity 0.3s ease;
+@media (max-width: 560px) {
+  .splash__start {
+    padding: 3.2558139535vw 5.5813953488vw;
+  }
 }
-.splash__footer {
-  margin-top: 42px;
-  font-size: 10px;
-  letter-spacing: 0.2em;
-  color: #86758f;
+@media (min-width: 561px) {
+  .splash__start {
+    padding: 14px 24px;
+  }
 }
-.splash.is-open .splash__hint {
-  opacity: 0;
+@media (max-width: 560px) {
+  .splash__start {
+    border-radius: 3.7209302326vw;
+  }
 }
-
-/* ========================================
-   편지 봉투
-======================================== */
-.envelope {
-  position: relative;
-  display: block;
-  width: min(280px, 76vw);
-  height: 185px;
-  margin: 66px auto 0;
-  padding: 0;
-  border: 0;
-  background: transparent;
+@media (min-width: 561px) {
+  .splash__start {
+    border-radius: 16px;
+  }
+}
+.splash__start {
+  font-size: 15px;
+}
+@media (max-width: 600px) {
+  .splash__start {
+    font-size: 14px;
+  }
+}
+@media (min-width: 601px) {
+  .splash__start {
+    font-size: 17px;
+  }
+}
+.splash__start {
+  font-weight: 700;
+  line-height: 1.5;
+  color: #fff;
+  background: linear-gradient(135deg, #c96ca6, #9474ca);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  box-shadow: 0 6px 20px rgba(96, 40, 80, 0.25);
   cursor: pointer;
-  perspective: 900px;
-  filter: drop-shadow(0 18px 30px rgba(0, 0, 0, 0.25));
-}
-.envelope__back {
-  position: absolute;
-  inset: 0;
-  border-radius: 8px;
-  background: #df9bbf;
-}
-.envelope__letter {
-  position: absolute;
-  left: 9%;
-  bottom: 8%;
-  width: 82%;
-  height: 82%;
-  border-radius: 5px;
-  background: #fff7fa;
-  transform: translateY(0);
-  transition: transform 0.75s ease 0.25s;
-}
-.envelope__front {
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  border-radius: 0 0 8px 8px;
-  background: #f4bdd9;
-  clip-path: polygon(0 0, 50% 53%, 100% 0, 100% 100%, 0 100%);
-}
-.envelope__flap {
-  position: absolute;
-  inset: 0;
-  z-index: 4;
-  background: #f9cce2;
-  clip-path: polygon(0 0, 100% 0, 50% 58%);
-  transform-origin: top center;
-  transition: transform 0.65s ease, z-index 0s 0.32s;
-}
-.envelope__seal {
-  position: absolute;
-  z-index: 5;
-  top: 49%;
-  left: 50%;
-  display: grid;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: #bd668f;
-  color: white;
-  font-size: 18px;
-  transform: translate(-50%, -50%);
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-.envelope:focus-visible {
-  outline: 3px solid #fff;
-  outline-offset: 8px;
-  border-radius: 8px;
-}
-
-/* ========================================
-   봉투 열림
-======================================== */
-.splash.is-open .envelope {
-  pointer-events: none;
-}
-.splash.is-open .envelope__flap {
-  transform: rotateX(180deg);
-  z-index: 1;
-}
-.splash.is-open .envelope__letter {
-  transform: translateY(-80px);
-}
-.splash.is-open .envelope__seal {
-  opacity: 0;
-  transform: translate(-50%, -50%) scale(0.6);
-}
-
-/* ========================================
-   편지 본문
-======================================== */
-.splash-letter {
-  width: min(100%, 340px);
-  margin: -20px auto 0;
-  padding: 28px 24px;
-  border: 1px solid #f4d6e4;
-  border-radius: 10px;
-  background: #fff9fc;
-  color: #493747;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
   opacity: 0;
   visibility: hidden;
-  transform: translateY(24px);
-  transition: opacity 0.5s ease, transform 0.5s ease, visibility 0.5s ease;
+  pointer-events: none;
+  translate: -50% 0;
+  transition: opacity 1000ms ease, visibility 0s linear 1000ms;
 }
-.splash-letter__label {
-  margin: 0 0 12px;
-  color: #bb7399;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.2em;
+.splash__start[hidden] {
+  display: none;
 }
-.splash-letter h2 {
-  margin: 0 0 16px;
-  font-size: 20px;
-  font-weight: 700;
-}
-p:not(.splash-letter__label) {
-  font-size: 13px;
-  line-height: 1.9;
-  color: #756473;
-}
-.splash-letter__start {
-  display: block;
-  width: 100%;
-  margin-top: 24px;
-  padding: 14px 20px;
-  border: none;
-  border-radius: 8px;
-  background: #db91b8;
-  color: #fff;
-  font: inherit;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s ease, transform 0.2s ease;
-}
-.splash-letter__start:hover {
-  background: #c878a4;
-  transform: translateY(-2px);
-}
-.splash-letter__start:focus-visible {
-  outline: 3px solid #80516f;
-  outline-offset: 3px;
-}
-
-.splash.is-open .splash-letter {
+.splash__start.is-revealed {
   opacity: 1;
   visibility: visible;
-  transform: translateY(0);
-  transition-delay: 0.65s;
+  pointer-events: auto;
+  transition: opacity 1000ms ease, visibility 0s;
+}
+.splash__start:hover:not(:disabled) {
+  filter: brightness(1.06);
+}
+.splash__start:focus-visible {
+  outline: 3px solid #75345c;
+  outline-offset: 4px;
+}
+.splash__start:disabled {
+  cursor: default;
 }
 
-/* ========================================
-   모바일
-======================================== */
-@media (max-width: 480px) {
-  .splash {
-    padding: 24px 16px;
-  }
-  .envelope {
-    margin-top: 50px;
-  }
-  .splash-letter {
-    padding: 24px 18px;
-  }
+.splash__footer {
+  margin-top: auto;
+  margin-bottom: 0;
+  font-size: 11px;
+}
+@media (max-width: 600px) {
   .splash__footer {
-    margin-top: 28px;
+    font-size: 10px;
+  }
+}
+@media (min-width: 601px) {
+  .splash__footer {
+    font-size: 13px;
+  }
+}
+.splash__footer {
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  line-height: 1.5;
+  color: #82436a;
+  text-shadow: 0 1px 4px rgba(255, 255, 255, 0.8);
+}
+
+@keyframes splash-celebrate-in {
+  from {
+    opacity: 0;
+    translate: 0 10px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+@keyframes splash-sparkle {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.7);
+  }
+  35% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.05);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.25);
+  }
+}
+@keyframes splash-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+@media (max-width: 360px) and (max-width: 560px) {
+  .splash__content {
+    padding: 6.976744186vw 3.2558139535vw 4.1860465116vw;
+  }
+}
+@media (max-width: 360px) and (min-width: 561px) {
+  .splash__content {
+    padding: 30px 14px 18px;
+  }
+}
+@media (max-width: 360px) {
+  .splash__hint {
+    font-size: 15px;
+  }
+}
+@media (max-width: 360px) and (max-width: 600px) {
+  .splash__hint {
+    font-size: 13px;
+  }
+}
+@media (max-width: 360px) and (min-width: 601px) {
+  .splash__hint {
+    font-size: 17px;
+  }
+}
+@media (max-width: 360px) {
+  .splash__hint.is-celebrating {
+    font-size: 17px;
+  }
+}
+@media (max-width: 360px) and (max-width: 600px) {
+  .splash__hint.is-celebrating {
+    font-size: 15px;
+  }
+}
+@media (max-width: 360px) and (min-width: 601px) {
+  .splash__hint.is-celebrating {
+    font-size: 19px;
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .splash,
-  .envelope *,
-  .splash-letter {
-    transition-duration: 0.01ms !important;
-    transition-delay: 0ms !important;
+  .splash.is-fading,
+  .splash__sparkles,
+  .splash__hint.is-celebrating {
+    animation-duration: 1ms;
   }
-}
-/* ==========================================
-   Dear Morara - Typography
-   전체 폰트 및 가독성 개선
-========================================== */
-:root {
-  font-size: 16px;
-}
-
-body {
-  font-family: "Pretendard", sans-serif;
-  font-size: 16px;
-  line-height: 1.65;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
-
-/* ==========================================
-   1. 게임 헤더
-========================================== */
-.header .profile strong {
-  font-size: 19px;
-  font-weight: 700;
-}
-.header .profile small {
-  font-size: 13px;
-  line-height: 1.5;
-}
-.header .stats {
-  font-size: 14px;
-  font-weight: 600;
-}
-.header .stats span {
-  font-size: inherit;
-}
-.header #restart {
-  font-size: 23px;
-}
-
-/* ==========================================
-   2. 채팅 영역
-========================================== */
-.chat {
-  font-size: 16px;
-}
-.chat .message-name,
-.chat .name {
-  font-size: 14px;
-  font-weight: 650;
-}
-.chat .bubble {
-  font-size: 16px;
-  line-height: 1.7;
-  letter-spacing: -0.015em;
-  overflow-wrap: anywhere;
-  white-space: pre-wrap;
-}
-.chat .message-time,
-.chat .time {
-  font-size: 12px;
-}
-
-/* ==========================================
-   3. 선택지 및 자유 입력
-========================================== */
-.footer .choice {
-  font-family: inherit;
-  font-size: 15px;
-  font-weight: 600;
-  line-height: 1.5;
-  min-height: 44px;
-  padding: 12px 16px;
-}
-.footer .freeform input {
-  font-family: inherit;
-  font-size: 16px;
-  line-height: 1.5;
-}
-.footer .freeform button {
-  font-family: inherit;
-  font-size: 15px;
-  font-weight: 650;
-}
-.footer .status {
-  font-size: 13px;
-  line-height: 1.5;
-}
-
-/* ==========================================
-   4. 편지형 스플래시
-========================================== */
-.splash__eyebrow {
-  font-size: 12px;
-}
-.splash__title {
-  font-size: clamp(44px, 9vw, 64px);
-  line-height: 1.15;
-}
-.splash__subtitle {
-  font-size: 16px;
-  line-height: 1.6;
-}
-.splash__hint {
-  font-size: 14px;
-}
-.splash__footer {
-  font-size: 11px;
-}
-
-.splash-letter__label {
-  font-size: 12px;
-}
-.splash-letter h2 {
-  font-size: 23px;
-  line-height: 1.4;
-}
-.splash-letter p:not(.splash-letter__label) {
-  font-size: 15px;
-  line-height: 1.9;
-}
-.splash-letter__start {
-  font-size: 16px;
-  min-height: 48px;
-}
-
-/* ==========================================
-   5. 모바일 화면
-========================================== */
-@media (max-width: 480px) {
-  .header .profile strong {
-    font-size: 17px;
-  }
-  .header .profile small {
-    font-size: 12px;
-  }
-  .header .stats {
-    font-size: 12px;
-  }
-  .chat .bubble {
-    font-size: 16px;
-    line-height: 1.65;
-  }
-  .chat .message-name,
-  .chat .name {
-    font-size: 13px;
-  }
-  .footer .choice {
-    font-size: 15px;
-  }
-  .footer .freeform input {
-    font-size: 16px;
-  }
-  .splash__title {
-    font-size: clamp(38px, 10vw, 48px);
-  }
-  .splash__subtitle {
-    font-size: 15px;
-  }
-  .splash-letter h2 {
-    font-size: 20px;
+  .splash__crown,
+  .splash__start {
+    transition-duration: 1ms;
   }
 }
 /* ==========================================
    Dear Morara - Ending Screen
 ========================================== */
 .ending-screen {
-  --ending-accent: #efb1d2;
   position: fixed;
   inset: 0;
-  z-index: 10000;
-  display: grid;
-  place-items: center;
-  min-height: 100dvh;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-x: hidden;
   overflow-y: auto;
-  padding: 24px 16px;
-  background: radial-gradient(ellipse at 50% 30%, rgba(224, 135, 190, 0.2), transparent 55%), #191525;
-  color: #fff0f7;
-  font-family: "Pretendard", sans-serif;
-  animation: ending-fade-in 0.8s ease both;
 }
-.ending-screen--normal {
-  --ending-accent: #d9c1f4;
+@media (max-width: 560px) {
+  .ending-screen {
+    padding: 5.5813953488vw 4.6511627907vw;
+  }
 }
-.ending-screen--bad {
-  --ending-accent: #aebbd5;
+@media (min-width: 561px) {
+  .ending-screen {
+    padding: 24px 20px;
+  }
+}
+.ending-screen {
+  background: rgba(25, 21, 37, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
-.ending-card {
-  width: min(100%, 440px);
+.ending-screen__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 430px;
   margin: auto;
+}
+@media (max-width: 560px) {
+  .ending-screen__content {
+    gap: 3.7209302326vw;
+  }
+}
+@media (min-width: 561px) {
+  .ending-screen__content {
+    gap: 16px;
+  }
+}
+@media (max-width: 560px) {
+  .ending-screen__content {
+    padding: 5.5813953488vw;
+  }
+}
+@media (min-width: 561px) {
+  .ending-screen__content {
+    padding: 24px;
+  }
+}
+@media (max-width: 560px) {
+  .ending-screen__content {
+    border-radius: 5.5813953488vw;
+  }
+}
+@media (min-width: 561px) {
+  .ending-screen__content {
+    border-radius: 24px;
+  }
+}
+.ending-screen__content {
+  background: #fff5fb;
+  box-shadow: 0 16px 50px rgba(20, 12, 35, 0.25);
   text-align: center;
 }
-.ending-card__eyebrow {
-  margin: 0 0 16px;
-  color: var(--ending-accent);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.25em;
+
+.ending-screen__image {
+  display: block;
+  width: 100%;
+  max-width: 320px;
+  height: auto;
+  aspect-ratio: 3/4;
 }
-.ending-card__brand {
+@media (max-width: 560px) {
+  .ending-screen__image {
+    border-radius: 3.7209302326vw;
+  }
+}
+@media (min-width: 561px) {
+  .ending-screen__image {
+    border-radius: 16px;
+  }
+}
+.ending-screen__image {
+  object-fit: cover;
+  box-shadow: 0 6px 24px rgba(96, 40, 80, 0.15);
+}
+
+.ending-screen__title {
   margin: 0;
-  font-size: clamp(36px, 8vw, 52px);
-  font-weight: 750;
-  letter-spacing: -0.045em;
+  font-size: 24px;
 }
-.ending-card__subtitle {
-  margin: 12px 0 34px;
-  color: #d5bccc;
-  font-size: 14px;
-  line-height: 1.7;
+@media (max-width: 600px) {
+  .ending-screen__title {
+    font-size: 20px;
+  }
 }
-.ending-card__result {
-  padding: 34px 24px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 22px;
-  background: rgba(255, 255, 255, 0.065);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(14px);
+@media (min-width: 601px) {
+  .ending-screen__title {
+    font-size: 28px;
+  }
 }
-.ending-card__symbol {
-  display: grid;
-  place-items: center;
-  width: 70px;
-  height: 70px;
-  margin: 0 auto 20px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.07);
-  color: var(--ending-accent);
-  font-size: 38px;
-}
-.ending-card__label {
-  margin: 0 0 12px;
-  color: var(--ending-accent);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.2em;
-}
-.ending-card__title {
-  margin: 0 0 18px;
-  font-size: clamp(22px, 5vw, 27px);
-  font-weight: 700;
+.ending-screen__title {
+  color: #79345f;
+  font-weight: 800;
   line-height: 1.4;
   word-break: keep-all;
 }
-.ending-card__message {
+
+.ending-screen__message {
   margin: 0;
-  color: #e4d3df;
-  font-size: 15px;
-  line-height: 1.9;
+  font-size: 14px;
+}
+@media (max-width: 600px) {
+  .ending-screen__message {
+    font-size: 13px;
+  }
+}
+@media (min-width: 601px) {
+  .ending-screen__message {
+    font-size: 16px;
+  }
+}
+.ending-screen__message {
+  color: #3d3040;
+  font-weight: 500;
+  line-height: 1.8;
   white-space: pre-line;
   word-break: keep-all;
 }
-.ending-card__score {
-  margin: 28px 0 0;
-  padding-top: 22px;
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
-  color: #d3b5ca;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-}
-.ending-card__restart {
+
+.ending-screen__button {
+  display: block;
   width: 100%;
-  min-height: 52px;
-  margin-top: 22px;
-  border: 0;
-  border-radius: 12px;
-  background: var(--ending-accent);
-  color: #33263a;
-  font: inherit;
+  max-width: 300px;
+  margin-inline: auto;
+}
+@media (max-width: 560px) {
+  .ending-screen__button {
+    padding: 3.2558139535vw 4.6511627907vw;
+  }
+}
+@media (min-width: 561px) {
+  .ending-screen__button {
+    padding: 14px 20px;
+  }
+}
+@media (max-width: 560px) {
+  .ending-screen__button {
+    border-radius: 3.488372093vw;
+  }
+}
+@media (min-width: 561px) {
+  .ending-screen__button {
+    border-radius: 15px;
+  }
+}
+.ending-screen__button {
   font-size: 15px;
+}
+@media (max-width: 600px) {
+  .ending-screen__button {
+    font-size: 14px;
+  }
+}
+@media (min-width: 601px) {
+  .ending-screen__button {
+    font-size: 17px;
+  }
+}
+.ending-screen__button {
+  border: 0;
+  background: linear-gradient(135deg, #c96ca6, #9474ca);
+  color: #fff;
   font-weight: 700;
+  line-height: 1.5;
   cursor: pointer;
-  transition: transform 0.2s ease, filter 0.2s ease;
 }
-.ending-card__restart:hover {
-  transform: translateY(-2px);
-  filter: brightness(1.07);
+.ending-screen__button:hover {
+  filter: brightness(1.06);
 }
-.ending-card__restart:focus-visible {
-  outline: 3px solid white;
+.ending-screen__button:focus-visible {
+  outline: 3px solid #75345c;
   outline-offset: 4px;
 }
-.ending-card__footer {
-  margin: 30px 0 0;
-  color: #9f8ca6;
-  font-size: 10px;
-  letter-spacing: 0.18em;
-}
 
-@keyframes ending-fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(18px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-@media (max-width: 480px) {
-  .ending-card__result {
-    padding: 28px 18px;
-  }
-  .ending-card__subtitle {
-    margin-bottom: 26px;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
+@media (max-width: 360px) and (max-width: 560px) {
   .ending-screen {
-    animation: none;
+    padding: 3.7209302326vw 2.7906976744vw;
+  }
+}
+@media (max-width: 360px) and (min-width: 561px) {
+  .ending-screen {
+    padding: 16px 12px;
+  }
+}
+@media (max-width: 360px) and (max-width: 560px) {
+  .ending-screen__content {
+    padding: 3.7209302326vw;
+  }
+}
+@media (max-width: 360px) and (min-width: 561px) {
+  .ending-screen__content {
+    padding: 16px;
+  }
+}
+@media (max-width: 360px) and (max-width: 560px) {
+  .ending-screen__content {
+    gap: 2.7906976744vw;
+  }
+}
+@media (max-width: 360px) and (min-width: 561px) {
+  .ending-screen__content {
+    gap: 12px;
   }
 }
 
