@@ -1,0 +1,16 @@
+@use "variables" as v;
+.footer { padding: 14px; border-top: 1px solid v.$border; background: #fff;
+  .choices { display: grid; gap: 8px; }
+  .choice { width: 100%; padding: 12px; border: 1px solid #ffb6c8; background: #fff; border-radius: 12px; cursor: pointer; font-size: 13px; text-align: left;
+    &:hover:not(:disabled) { background: #fff0f4; }
+    &:disabled { opacity: .5; cursor: default; }
+  }
+  .freeform { display: flex; gap: 8px; margin-top: 8px;
+    &[hidden] { display: none; }
+    input { flex: 1; min-width: 0; padding: 12px; border: 1px solid #ffb6c8; border-radius: 12px; outline: none; background: #fff8fa;
+      &:focus { border-color: v.$primary; }
+    }
+    button { border: 0; border-radius: 12px; background: v.$primary; color: #4b2630; padding: 0 15px; cursor: pointer; }
+  }
+  .status { margin-top: 10px; color: #999; font-size: 11px; text-align: center; }
+}

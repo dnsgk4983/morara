@@ -1,0 +1,13 @@
+@use "variables" as v;
+.header { padding: 16px; display: flex; align-items: center; justify-content: space-between; gap: 8px; background: #fff; border-bottom: 1px solid v.$border;
+  .profile { display: flex; align-items: center; gap: 10px; min-width: 0;
+    img, .avatar { width: 42px; height: 42px; flex-shrink: 0; border-radius: 50%; object-fit: cover; background: #ffb8c8; }
+    strong { display: block; font-size: 15px; font-weight: 600; }
+    small { display: block; margin-top: 4px; color: #65b88d; font-size: 11px; }
+  }
+  .right, .header-right { display: flex; align-items: center; gap: 12px; }
+  .stats { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; font-size: 12px; white-space: nowrap; }
+  #restart, .restart-btn { width: 34px; height: 34px; flex-shrink: 0; display: grid; place-items: center; padding: 0; border: 1px solid #eee; border-radius: 50%; background: #fff; color: #888; font-size: 23px; cursor: pointer;
+    &:hover { background: #fff0f4; color: #e87999; border-color: #ffb6c8; }
+  }
+}

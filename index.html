@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    <link rel="stylesheet" href="./css/style.css">
+    <title>모라라와 10일</title>
+</head>
+
+<body>
+    <main class="game">
+        <header class="header">
+            <div class="profile"><img src="./assets/images/profile.png" alt="임시 프로필">
+                <div><strong>모라라 💗</strong><small>온라인 · 팬 제작 가상 스토리</small></div>
+            </div>
+            <div class="right">
+                <div class="stats"><span id="day">DAY 1 / 10</span><span id="affection">💗 0</span></div><button
+                    id="restart" title="처음부터">↻</button>
+            </div>
+        </header>
+        <section id="chat" class="chat" aria-live="polite"></section>
+        <footer class="footer">
+            <div id="choices" class="choices"></div>
+            <form id="freeform" class="freeform" hidden><input id="answer" maxlength="160" autocomplete="off"
+                    placeholder="답장을 직접 입력하시오..." required><button type="submit">전송</button></form>
+            <div id="status" class="status"></div>
+        </footer>
+    </main>
+    <script src="./data/story.js"></script>
+    <script src="./js/main.js"></script>
+</body>
+
+</html>
