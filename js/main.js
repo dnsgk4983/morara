@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // ==========================================
   // 1. 기본 설정
   // ==========================================
-  const SAVE_KEY = "morara-v4-multiline";
+  const LEGACY_SAVE_KEY = "morara-v4-multiline";
 
   const MESSAGE_DELAY = 750;
   const TYPING_SPEED = 20;
@@ -30,9 +30,9 @@ document.addEventListener("DOMContentLoaded", () => {
     console.error("Dear Morara: 필수 HTML 요소가 없습니다.");
     return;
   }
-  if (stories.length !== 10 || stories.some(day => day.beats.length < 10)) {
+  if (stories.length !== 10 || stories.some(day => day.beats.length < 3 || day.beats.length > 5)) {
     elements.status.textContent = "data/story.js를 먼저 불러와 주세요.";
-    console.error("Dear Morara: 10일 × 10장면 스토리 데이터 누락");
+    console.error("Dear Morara: 10일 × 최대 5장면 스토리 데이터 누락");
     return;
   }
 
@@ -40,30 +40,23 @@ document.addEventListener("DOMContentLoaded", () => {
   // 2. 저장 및 복원
   // ==========================================
   const initialState = () => ({
-    day: 1, beat: 0, affection: 0, flags: { trust: 0, playful: 0, steady: 0, creative: 0, empathy: 0 },
+    day: 10, beat: 0, affection: 50, flags: { trust: 0, playful: 0, steady: 0, creative: 0, empathy: 0 },
     choices: [], history: [], phase: "intro", lineIndex: 0, completed: false
   });
-  function loadState() {
-    try {
-      const saved = JSON.parse(localStorage.getItem(SAVE_KEY) || "null");
-      if (!saved || !Number.isInteger(saved.day) || saved.day < 1 || saved.day > 10 ||
-          !Number.isInteger(saved.beat) || saved.beat < 0 || saved.beat > 10 ||
-          !Array.isArray(saved.history) || !Array.isArray(saved.choices)) return initialState();
-      return { ...initialState(), ...saved, flags: { ...initialState().flags, ...saved.flags } };
-    } catch { return initialState(); }
-  }
-  let state = loadState();
+  // 매 방문마다 새 게임으로 시작한다. 이전 버전 저장 데이터도 정리한다.
+  try { localStorage.removeItem(LEGACY_SAVE_KEY); } catch (_) { /* 저장소 접근 제한 */ }
+  let state = initialState();
   let running = false;
   let sequence = 0;
   let started = false;
-  const save = () => localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+  const save = () => {}; // 진행 기록을 브라우저에 저장하지 않음
   const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
   const story = () => stories[state.day - 1];
   const scrollBottom = () => { elements.chat.scrollTop = elements.chat.scrollHeight; };
   function updateStatus() {
     elements.day.textContent = `DAY ${state.day} / 10`;
     elements.affection.textContent = `💗 ${state.affection}`;
-    elements.status.textContent = `${story().title} · ${Math.min(state.beat + 1, 10)} / 10`;
+    elements.status.textContent = `${story().title} · ${Math.min(state.beat + 1, story().beats.length)} / ${story().beats.length}`;
   }
   function clearControls() {
     elements.choices.replaceChildren();
@@ -165,7 +158,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   function choiceButtons() {
     clearControls();
-    if (state.completed || state.beat >= 10) return;
+    if (state.completed || state.beat >= story().beats.length) return;
     const beat = story().beats[state.beat];
     beat.options.forEach(option => {
       const button = document.createElement("button");
@@ -176,18 +169,6 @@ document.addEventListener("DOMContentLoaded", () => {
       elements.choices.appendChild(button);
     });
     scrollAfterControls();
-  }
-  function relationalLine() {
-    const { trust, playful, steady } = state.flags;
-    if (state.day === 10 && state.beat === 9) {
-      if (trust >= 20) return "네가 매번 내 이야기를 진지하게 들어준 거, 나도 기억하고 있어. 💗";
-      if (playful >= 20) return "너랑 있으면 꼭 한 번은 웃게 돼. 그게 정말 좋았어!";
-      return "조용히 함께해 준 순간들도 소중했어. 고마워.";
-    }
-    if (state.beat === 5 && trust >= 12) return "그러고 보니 너는 늘 내 얘기를 끝까지 들어주네. 고마워.";
-    if (state.beat === 5 && playful >= 12) return "오늘도 장난치는 거 보니까 우리 꽤 친해졌나 봐 ㅋㅋ";
-    if (state.beat === 5 && steady >= 12) return "너는 차분하게 들어줘서 얘기하기 편해.";
-    return null;
   }
   // 현재 날짜의 실제 대사 내용에 따라 일러스트 삽입 장면을 선택한다.
   // 기존 story.js의 imageAfter 고정값보다 아래 문맥 판정을 우선한다.
@@ -235,7 +216,7 @@ document.addEventListener("DOMContentLoaded", () => {
       state.lineIndex = index + 1;
       save();
     }
-    if (state.beat === imageBeatIndex() && !imageAlreadyShown()) {
+    if (beat.imageAfter && !imageAlreadyShown()) {
       await wait(500);
       if (current !== sequence) { running = false; return; }
       addImage(story().image);
@@ -264,9 +245,7 @@ document.addEventListener("DOMContentLoaded", () => {
     for (const line of option.reply) {
       if (!await say(line, current)) { running = false; return; }
     }
-    const extra = relationalLine();
-    if (extra && !await say(extra, current)) { running = false; return; }
-    state.beat += 1;
+    state.beat = Number.isInteger(option.next) ? option.next : state.beat + 1;
     state.lineIndex = 0;
     state.phase = "intro";
     save();
@@ -304,18 +283,64 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ==========================================
-  // 5. 엔딩 3종
+  // 5. 엔딩 5종 — 방송 매너 / 티키타카 / 진정성 / 히든 기록
   // ==========================================
-  function showEnding() {
+  async function showEnding() {
+    // 결과 화면으로 넘어가기 전 2.5초간 전환 연출을 보여 준다.
+    if (document.getElementById("ending-transition")) return;
+    const overlay = document.createElement("div");
+    overlay.id = "ending-transition";
+    overlay.setAttribute("role", "status");
+    overlay.setAttribute("aria-live", "polite");
+    overlay.style.cssText = [
+      "position:fixed", "inset:0", "z-index:2147483647",
+      "display:flex", "flex-direction:column", "align-items:center",
+      "justify-content:center", "gap:18px", "padding:24px",
+      "box-sizing:border-box", "background:#171624",
+      "color:#ffe5ed", "text-align:center", "opacity:0",
+      "transition:opacity 350ms ease", "pointer-events:all"
+    ].join(";");
+    const heart = document.createElement("div");
+    heart.textContent = "♡";
+    heart.style.cssText = "font-size:64px;line-height:1;color:#ff9fbd";
+    const title = document.createElement("div");
+    title.textContent = "공주님의 반응을 확인하는 중...";
+    title.style.cssText = "font-size:clamp(18px,4vw,24px);font-weight:700";
+    const subtitle = document.createElement("div");
+    subtitle.textContent = "지난 10일간의 기록을 살펴보고 있어요.";
+    subtitle.style.cssText = "font-size:14px;color:#bcb4c9";
+    overlay.append(heart, title, subtitle);
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => { overlay.style.opacity = "1"; });
+    await wait(2150);
+    overlay.style.opacity = "0";
+    await wait(350);
+    overlay.remove();
+    renderEnding();
+  }
+
+  function renderEnding() {
     document.getElementById("ending-screen")?.remove();
-    const trust = state.flags.trust || 0;
-    const empathy = state.flags.empathy || 0;
-    const type = state.affection >= 300 && (trust + empathy) >= 20 ? "happy" : state.affection >= 210 ? "normal" : "bad";
+    const f = state.flags;
+    const manners = (f.trust || 0) + (f.empathy || 0);
+    const banter = f.playful || 0;
+    const excessive = f.steady || 0;
+    const boundary = f.creative || 0;
+    const hidden = f.hidden || 0;
+    // 점수는 보조 지표. 선 넘는 선택은 높은 점수로 상쇄되지 않는다.
+    let type = "normal";
+    if (boundary >= 3) type = "timeout";
+    else if (excessive >= 5 && banter < 5) type = "loyal";
+    else if (hidden >= 2 && manners >= 13 && boundary === 0) type = "hidden";
+    else if (manners >= 15 && banter >= 8 && boundary <= 1) type = "true";
     const copy = {
-      happy: ["해피 엔딩 — 우리의 산호마을", "너와 나눈 열흘의 이야기가 오래도록 따뜻한 기억으로 남을 것 같아. 다음에 또 만나자! 💗🐟"],
-      normal: ["노멀 엔딩 — 다음에 또 만나자", "매일 함께해 줘서 고마워. 다음엔 더 많은 이야기를 나눌 수 있겠지?"],
-      bad: ["아쉬운 엔딩 — 남겨진 작은 별빛", "조금은 서툴렀지만, 함께한 시간은 사라지지 않아. 언젠가 또 반갑게 인사하자."]
+      true: ["야랄단 수석 졸업", "아니 나 공략당한 게 아니라 10일 동안 놀림당한 거 아니야?! ㅋㅋㅋ\n공략 성공 — 야랄단 정회원"],
+      normal: ["오래오래 코랄단", "뭐야, 되게 평범하게 끝나네? 근데 이런 것도 좋지.\n공략 성공 — 좋은 시청자"],
+      loyal: ["충성! 공주님!", "아니 너는 왜 내가 뭘 해도 다 맞대? ㅋㅋㅋ\n공략 실패 — 과잉 충성"],
+      timeout: ["10분 채팅 금지", "아니 몇 번을 말해! ㅋㅋㅋ 오늘은 채팅 좀 쉬어!\n공략 실패 — 임시 채팅 제한 (게임 속 연출)"],
+      hidden: ["어푸어푸, 그리고 내일", "잠깐, 이거 다 이어지는 거였어?\n함께 보낸 열흘의 기억. 아 진짜... 고맙다.\n공략 완료 — 내일 방송에서 만나"]
     };
+    const imageFor = {true:"ending_happy",normal:"ending_normal",loyal:"ending_normal",timeout:"ending_bad",hidden:"ending_happy"};
     const screen = document.createElement("section");
     screen.id = "ending-screen";
     screen.className = "ending-screen";
@@ -325,7 +350,7 @@ document.addEventListener("DOMContentLoaded", () => {
     content.className = "ending-screen__content";
     const img = document.createElement("img");
     img.className = "ending-screen__image";
-    img.src = imagePaths[`ending_${type}`];
+    img.src = imagePaths[imageFor[type]];
     img.alt = copy[type][0];
     const title = document.createElement("h2");
     title.className = "ending-screen__title";
@@ -333,6 +358,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const message = document.createElement("p");
     message.className = "ending-screen__message";
     message.textContent = copy[type][1];
+    message.style.whiteSpace = "pre-line";
     const button = document.createElement("button");
     button.className = "ending-screen__button";
     button.type = "button";
@@ -343,15 +369,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.appendChild(screen);
   }
   function restart() {
-    sequence++;
-    running = false;
-    state = initialState();
-    save();
-    document.getElementById("ending-screen")?.remove();
-    elements.chat.replaceChildren();
-    clearControls();
-    updateStatus();
-    presentBeat();
+    window.location.reload();
   }
 
   // ==========================================
@@ -428,29 +446,112 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ==========================================
+  // 6-A. 산호마을 오프닝 (기존 왕관 코드는 위에 보존)
+  // ==========================================
+  function initializeIntro() {
+    const intro = document.getElementById("intro");
+    const stage = document.getElementById("intro-stage");
+    const image = document.getElementById("intro-image");
+    const action = document.getElementById("intro-action");
+    const caption = document.getElementById("intro-caption");
+    const notification = document.getElementById("intro-notification");
+    if (!intro || !stage || !image || !action || !caption || !notification) {
+      launch();
+      return;
+    }
+    document.body.style.overflow = "hidden";
+    let busy = false;
+    // 플로팅은 완성된 알림을 보여주고, 채팅 진입 후에만 타이핑한다.
+    notification.disabled = true;
+    action.style.zIndex = "5";
+    notification.style.zIndex = "10";
+    const frames = [
+      { src: "intro_portal.png", alt: "산호마을로 빨려 들어가는 소용돌이", delay: 1500, effect: "is-portal" },
+      { src: "intro_village.png", alt: "산호마을에 도착한 풍경", delay: 1700 },
+      { src: "intro_phone_out.png", alt: "휴대폰을 꺼내는 모습", delay: 1100 },
+      { src: "intro_phone_hold.png", alt: "손에 든 휴대폰", delay: 900 }
+    ];
+    const preload = frames.map(frame => {
+      const img = new Image();
+      img.src = `./assets/images/${frame.src}`;
+      return img;
+    });
+    // 화면의 이미지나 장식 레이어를 눌러도 휴대폰 터치로 처리한다.
+    // 캡처 단계에서 처리해 CSS 레이어가 버튼을 가리는 경우도 방지한다.
+    const touchPhone = async () => {
+      if (busy) return;
+      busy = true;
+      action.hidden = true;
+      for (let i = 0; i < frames.length; i++) {
+        const frame = frames[i];
+        stage.classList.remove("is-portal");
+        stage.classList.add("is-transitioning");
+        await wait(220);
+        image.src = `./assets/images/${frame.src}`;
+        image.alt = frame.alt;
+        stage.classList.toggle("is-portal", frame.effect === "is-portal");
+        stage.classList.remove("is-transitioning");
+        await wait(frame.delay);
+      }
+      notification.hidden = false;
+      notification.classList.add("is-visible");
+      // 알림 텍스트는 처음부터 완성된 상태로 표시한다.
+      await wait(window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 720);
+      notification.disabled = false;
+    };
+    stage.addEventListener("click", event => {
+      if (busy || !notification.hidden || event.target.closest("#intro-notification")) return;
+      void touchPhone();
+    }, true);
+    action.addEventListener("click", () => { void touchPhone(); });
+    notification.addEventListener("click", async () => {
+      if (started) return;
+      notification.disabled = true;
+      intro.classList.add("is-leaving");
+      await wait(650);
+      intro.remove();
+      document.body.style.overflow = "";
+      launch();
+    }, { once: true });
+  }
+
+  // ==========================================
   // 7. 실행 / 이어하기
   // ==========================================
   function launch() {
     if (started) return;
     started = true;
     updateStatus();
+    // 새 게임에서는 알림 문구를 채팅 진입 후 첫 타이핑 메시지로 출력한다.
+    // 이미 저장된 메시지는 재출력하지 않으며, 복원 기록은 즉시 표시한다.
+    const firstChat = state.day === 1 && state.beat === 0 && state.history.length === 0;
     renderHistory();
     if (state.completed) { completeDay(); return; }
     if (state.phase === "awaiting") { choiceButtons(); return; }
     // 중간 저장 상태가 대답 출력 중이었다면 다음 장면으로 안전하게 복구
     if (state.phase === "reply") {
-      state.beat = Math.min(state.beat + 1, 10);
+      state.beat = Math.min(state.beat + 1, story().beats.length);
       state.lineIndex = 0;
       state.phase = "intro";
       save();
     }
-    if (state.beat >= 10) { completeDay(); return; }
-    presentBeat();
+    if (state.beat >= story().beats.length) { completeDay(); return; }
+    if (firstChat) {
+      (async () => {
+        const current = ++sequence;
+        running = true;
+        const ok = await say("어라? 처음 보는 사람이네?", current);
+        running = false;
+        if (ok && current === sequence) presentBeat();
+      })();
+    } else {
+      presentBeat();
+    }
   }
   elements.restart?.addEventListener("click", () => {
     if (window.confirm("열흘의 이야기를 처음부터 다시 시작할까요?")) restart();
   });
   // 기존 자유 입력은 선택지 분기와 충돌하므로 이번 버전에서 숨김
   if (elements.freeform) elements.freeform.hidden = true;
-  initializeSplash();
+  initializeIntro();
 });

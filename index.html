@@ -6,19 +6,32 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <link rel="icon" href="data:,">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
-    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/style.css?v=20261108-romance-v3">
     <title>모라라와 10일</title>
 </head>
 
 <body>
     
-<!-- 편지형 스플래시 화면 -->
+<!-- 새로운 산호마을 오프닝: 왕관 이벤트는 기존 코드에 보존 -->
+<div id="intro" class="intro" aria-label="산호마을 오프닝">
+  <div class="intro__stage" id="intro-stage">
+    <img id="intro-image" class="intro__image" src="./assets/images/intro_phone.png?v=20261108-romance-v3" alt="바닥에 떨어진 휴대폰">
+    <div class="intro__glow" aria-hidden="true"></div>
+    <button id="intro-action" class="intro__action" type="button" aria-label="떨어진 휴대폰을 터치하기">
+      <span id="intro-caption">휴대폰을 터치해 보세요</span>
+    </button>
+    <button id="intro-notification" class="intro__notification" type="button" hidden>
+      <span class="intro__app">💗</span><span><strong>모라라챗 · 모라라 🐟</strong><small>어라? 처음 보는 사람이네?</small></span>
+    </button>
+  </div>
+</div>
+<!-- 편지형 스플래시 화면 (왕관 이벤트 보존 / 현재 미사용) -->
 
-<div id="splash" class="splash">
+<div id="splash" class="splash" hidden>
   <div class="splash__scene" id="splash-scene">
     <img
       class="splash__art"
-      src="./assets/images/splash.png"
+      src="./assets/images/splash.png?v=20261108-romance-v3"
       alt="모라라가 왕실 정원에서 손을 내밀고 있는 모습"
       draggable="false"
     >
@@ -28,7 +41,7 @@
     <img
       id="splash-crown"
       class="splash__crown"
-      src="./assets/images/splash_deco.png"
+      src="./assets/images/splash_deco.png?v=20261108-romance-v3"
       alt="모라라에게 씌울 왕관"
       draggable="false"
       tabindex="0"
@@ -74,7 +87,7 @@
 
     <main class="game">
         <header class="header">
-            <div class="profile"><img src="./assets/images/profile.png" alt="임시 프로필">
+            <div class="profile"><img src="./assets/images/profile.png?v=20261108-romance-v3" alt="임시 프로필">
                 <div><strong>모라라 💗</strong><small>온라인 · 팬 제작 가상 스토리</small></div>
             </div>
             <div class="right">
@@ -90,8 +103,8 @@
             <div id="status" class="status"></div>
         </footer>
     </main>
-    <script src="./data/story.js"></script>
-    <script src="./js/main.js"></script>
+    <script src="./data/story.js?v=20261108-broadcast-touchfix-v2"></script>
+    <script src="./js/main.js?v=20261108-broadcast-touchfix-v2"></script>
 </body>
 
 </html>
