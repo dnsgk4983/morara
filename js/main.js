@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // 2. 저장 및 복원
   // ==========================================
   const initialState = () => ({
-    day: 10, beat: 0, affection: 50, flags: { trust: 0, playful: 0, steady: 0, creative: 0, empathy: 0 },
+    day: 1, beat: 0, affection: 0, flags: { trust: 0, playful: 0, steady: 0, creative: 0, empathy: 0 },
     choices: [], history: [], phase: "intro", lineIndex: 0, completed: false
   });
   // 매 방문마다 새 게임으로 시작한다. 이전 버전 저장 데이터도 정리한다.
