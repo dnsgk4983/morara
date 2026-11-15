@@ -1,0 +1,8 @@
+@use "sass:math";
+
+// 디자인 기준 폭 600px: 600 이하 vw, 600 이상 px로 고정.
+// 사용: @include vw(font-size, 40px);
+@mixin vw($property, $value) {
+  #{$property}: min(#{math.div($value, 600px) * 100}vw, #{$value});
+}
+

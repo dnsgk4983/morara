@@ -1,110 +1,120 @@
 <!doctype html>
 <html lang="ko">
-
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <link rel="icon" href="data:,">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
-    <link rel="stylesheet" href="./css/style.css?v=20261108-romance-v3">
-    <title>모라라와 10일</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#191525">
+  <title>공주님, 답장은 제가 할게요</title>
+  <link rel="stylesheet" href="./css/style.css?v=clean-v11-1-20261116">
+  <script src="./data/story.js?v=clean-v11-1-20261116" defer></script>
+  <script src="./js/main.js?v=clean-v11-1-20261116" defer></script>
 </head>
-
 <body>
-    
-<!-- 새로운 산호마을 오프닝: 왕관 이벤트는 기존 코드에 보존 -->
-<div id="intro" class="intro" aria-label="산호마을 오프닝">
-  <div class="intro__stage" id="intro-stage">
-    <img id="intro-image" class="intro__image" src="./assets/images/intro_phone.png?v=20261108-romance-v3" alt="바닥에 떨어진 휴대폰">
-    <div class="intro__glow" aria-hidden="true"></div>
-    <button id="intro-action" class="intro__action" type="button" aria-label="떨어진 휴대폰을 터치하기">
-      <span id="intro-caption">휴대폰을 터치해 보세요</span>
-    </button>
-    <button id="intro-notification" class="intro__notification" type="button" hidden>
-      <span class="intro__app">💗</span><span><strong>모라라챗 · 모라라 🐟</strong><small>어라? 처음 보는 사람이네?</small></span>
-    </button>
-  </div>
-</div>
-<!-- 편지형 스플래시 화면 (왕관 이벤트 보존 / 현재 미사용) -->
-
-<div id="splash" class="splash" hidden>
-  <div class="splash__scene" id="splash-scene">
-    <img
-      class="splash__art"
-      src="./assets/images/splash.png?v=20261108-romance-v3"
-      alt="모라라가 왕실 정원에서 손을 내밀고 있는 모습"
-      draggable="false"
-    >
-
-    <div id="crown-target" class="splash__target"></div>
-
-    <img
-      id="splash-crown"
-      class="splash__crown"
-      src="./assets/images/splash_deco.png?v=20261108-romance-v3"
-      alt="모라라에게 씌울 왕관"
-      draggable="false"
-      tabindex="0"
-      role="button"
-      aria-label="왕관을 모라라에게 씌우기"
-    >
-
-    <div class="splash__sparkles" aria-hidden="true">
-      <span>✦</span>
-      <span>✧</span>
-      <span>✦</span>
-      <span>✧</span>
-      <span>✦</span>
+  <section class="splash splash--image-title" id="splash" aria-label="시작 화면">
+    <div class="splash__scene" id="splash-scene">
+      <img class="splash__scene__art" src="./assets/images/title_bg.png" alt="" aria-hidden="true">
+      <img class="splash__scene__title" src="./assets/images/title_text.png" alt="공주님, 답장은 제가 할게요 — 기사단장, 타타 막혔습니다!">
+      <button class="splash__scene__start__button" id="splash-start" type="button"><span>이야기 시작하기</span></button>
     </div>
+  </section>
+  <main class="app" id="app">
+    <section class="opening" id="opening" aria-label="프롤로그">
+      <img class="opening__image" id="opening-image" src="./assets/images/intro_phone.png" alt="해변에 떨어진 휴대폰">
+      <div class="opening__shade"></div>
+      <button class="opening__notification" id="opening-notification" type="button" hidden aria-label="모라라의 새 메시지 확인">
+        <img class="opening__notification-avatar" src="./assets/images/profile.png" alt="">
+        <span class="opening__notification-copy"><strong>모라라 <small>지금</small></strong><span>단자아아앙!! 어디야아!</span></span>
+      </button>
+      <div class="opening__content">
+        <p class="eyebrow" id="opening-kicker">1월 4일 · 노을이 지는 해변</p>
+        <h1 id="opening-title">공주님,<br>답장은 제가 할게요.</h1>
+        <p id="opening-description">모래사장 위에서 휴대폰 한 대를 발견했다.</p>
+        <button class="primary-button" id="opening-next" type="button">휴대폰 살펴보기</button>
+        <button class="quiet-button" id="opening-continue" type="button" hidden>이어하기</button>
+      </div>
+    </section>
 
-    <div class="splash__content">
-      <p class="splash__eyebrow">A BIRTHDAY STORY</p>
-      <h1 class="splash__title">Dear Morara</h1>
-      <p class="splash__subtitle">너에게 닿는 열흘의 이야기</p>
+    <section class="game" id="game" hidden aria-label="메신저 이야기">
+      <header class="topbar">
+        <div class="identity">
+          <img src="./assets/images/profile.png" alt="모라라 프로필" class="identity__avatar">
+          <div class="identity__info">
+            <strong>모라라 <span aria-hidden="true">✦</span></strong>
+            
+          </div>
+        </div>
+        <div class="topbar__actions">
+          <span class="day-pill" id="day-label">DAY 1 · D-6</span>
+          <button class="icon-button" id="menu-button" type="button" aria-label="설정 열기">☰</button>
+        </div>
+      </header>
 
-      <div class="splash__actions">
-        <p id="splash-hint" class="splash__hint">
-          왕관을 모라라에게 씌워주세요
-        </p>
-
-        <button
-          id="start-story"
-          class="splash__start"
-          type="button"
-          hidden
-        >
-          이야기 시작하기
-        </button>
+      <div class="chapter-banner" id="chapter-banner" hidden>
+        <span id="chapter-date"></span>
+        <strong id="chapter-title"></strong>
       </div>
 
-      <p class="splash__footer">
-        FAN-MADE BIRTHDAY PROJECT
-      </p>
+      <section class="chat" id="chat" aria-label="채팅 내역" aria-live="off" tabindex="0"></section>
+
+      <footer class="composer">
+        <div class="composer__hint" id="hint" hidden></div>
+        <div class="choices" id="choices" aria-label="답장 선택"></div>
+        <button class="next-button" id="next-button" type="button" hidden>다음 메시지 <span aria-hidden="true">›</span></button>
+      </footer>
+    </section>
+  </main>
+
+  <dialog class="modal" id="image-modal" aria-label="이미지 보기">
+    <button class="modal__close" id="image-close" type="button"><span aria-hidden="true">×</span><span class="visually-hidden">닫기</span></button>
+    <img id="modal-image" alt="확대 이미지">
+    <p id="modal-caption"></p>
+  </dialog>
+
+  <dialog class="modal settings" id="settings-modal" aria-label="게임 설정">
+    <div class="settings__head"><h2>설정</h2><button class="icon-button" id="settings-close" type="button">✕</button></div>
+    <p class="settings__note">선택지를 누르면 메시지가 즉시 전송되고, 모라라의 답장은 자동으로 도착합니다. 선택지에서만 멈춥니다.</p>
+    <section class="settings__speed" aria-label="대화 속도 설정">
+      <div class="settings__speed-title"><strong>대화 속도</strong><span>메시지 도착 간격</span></div>
+      <div class="settings__speed-options" role="group" aria-label="대화 속도 선택">
+        <button class="settings__speed-option" type="button" data-speed="slow" aria-pressed="false">느리게</button>
+        <button class="settings__speed-option" type="button" data-speed="normal" aria-pressed="true">보통</button>
+        <button class="settings__speed-option" type="button" data-speed="fast" aria-pressed="false">빠르게</button>
+      </div>
+      <button class="settings__preview-button" id="speed-test" type="button">선택한 속도 미리보기</button>
+      <div class="settings__preview" id="speed-preview" aria-live="polite" hidden><div class="preview-bubble" id="preview-bubble"></div></div>
+    </section>
+    <label class="settings__field settings__field--toggle" for="motion-toggle"><span class="settings__field-copy"><strong>애니메이션 최소화</strong><small>움직임을 줄여 편안하게 감상합니다.</small></span><span class="settings__switch"><input type="checkbox" id="motion-toggle"><span class="settings__switch-track" aria-hidden="true"></span></span></label>
+    <button class="secondary-button" id="gallery-button" type="button">일러스트 갤러리</button>
+    <button class="secondary-button" id="restart-button" type="button">처음부터 시작</button>
+    <p class="settings__note">진행 기록은 이 브라우저에 자동 저장됩니다. 원본 이미지 파일은 변경하지 않았습니다.</p>
+  </dialog>
+
+  <dialog class="modal gallery" id="gallery-modal" aria-label="일러스트 갤러리">
+    <div class="settings__head"><h2>일러스트 갤러리</h2><button class="icon-button" id="gallery-close" type="button">✕</button></div>
+    <div class="gallery__grid" id="gallery-grid"></div>
+  </dialog>
+
+  <section class="ending-loading" id="ending-loading" hidden role="status" aria-live="polite" aria-label="결말을 준비하는 중">
+    <div class="ending-loading__inner">
+      <div class="ending-loading__symbol" aria-hidden="true">✦</div>
+      <p class="ending-loading__eyebrow">CORAL KINGDOM</p>
+      <h2>마지막 답장을 전하는 중…</h2>
+      <p>우리의 7일이 하나의 이야기로 이어집니다.</p>
+      <div class="ending-loading__progress"><span></span></div>
     </div>
-  </div>
-</div>
-
-
-    <main class="game">
-        <header class="header">
-            <div class="profile"><img src="./assets/images/profile.png?v=20261108-romance-v3" alt="임시 프로필">
-                <div><strong>모라라 💗</strong><small>온라인 · 팬 제작 가상 스토리</small></div>
-            </div>
-            <div class="right">
-                <div class="stats"><span id="day">DAY 1 / 10</span><span id="affection">💗 0</span></div><button
-                    id="restart" title="처음부터">↻</button>
-            </div>
-        </header>
-        <section id="chat" class="chat" aria-live="polite"></section>
-        <footer class="footer">
-            <div id="choices" class="choices"></div>
-            <form id="freeform" class="freeform" hidden><input id="answer" maxlength="160" autocomplete="off"
-                    placeholder="답장을 직접 입력하시오..." required><button type="submit">전송</button></form>
-            <div id="status" class="status"></div>
-        </footer>
-    </main>
-    <script src="./data/story.js?v=20261108-broadcast-touchfix-v2"></script>
-    <script src="./js/main.js?v=20261108-broadcast-touchfix-v2"></script>
+  </section>
+  <section class="ending-screen" id="ending-screen" hidden aria-label="결말 화면">
+    <div class="ending-screen__inner">
+      <p class="ending-screen__eyebrow">7 DAYS · THE END</p>
+      <span class="ending-screen__kind" id="ending-kind">ENDING</span>
+      <h2 id="ending-title"></h2>
+      <img id="ending-image" alt="결말 일러스트">
+      <div class="ending-screen__story" id="ending-story"></div>
+      <div class="ending-screen__actions">
+        <button class="primary-button" id="ending-restart" type="button">처음부터 다시 보기</button>
+        <button class="secondary-button" id="ending-gallery" type="button">일러스트 갤러리</button>
+      </div>
+    </div>
+  </section>
 </body>
-
 </html>
