@@ -99,7 +99,6 @@
   &:hover {
     filter: brightness(1.06);
   }
-
   &:focus-visible {
     outline: 3px solid #75345c;
     outline-offset: 4px;
@@ -110,7 +109,6 @@
   .ending-screen {
     @include vw(padding, 16px 12px);
   }
-
   .ending-screen__content {
     @include vw(padding, 16px);
     @include vw(gap, 12px);

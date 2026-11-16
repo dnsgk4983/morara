@@ -42,7 +42,6 @@
   @if meta.type-of($values) != "list" {
     @return to-vw($values, $base);
   }
-
   // 여러 값
   $result: ();
   $separator: list.separator($values);

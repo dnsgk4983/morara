@@ -80,7 +80,6 @@
     &::placeholder {
       color: #b7a7b8;
     }
-
     &:focus {
       border-color: v.$color-primary;
       box-shadow: 0 0 0 3px rgba(233, 154, 197, 0.12);
@@ -109,13 +108,11 @@
   .choices {
     @include vw(gap, 7px);
   }
-
   .choice,
   .choice-button,
   .choices button {
     @include vw(padding, 11px 12px);
   }
-
   .freeform {
     @include vw(gap, 6px);
 

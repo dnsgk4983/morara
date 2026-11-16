@@ -29,7 +29,6 @@
   &.msg--morara {
     justify-content: flex-start;
   }
-
   &.me,
   &.user,
   &.message--me,
@@ -60,7 +59,6 @@
 .msg--user .msg__content {
   align-items: flex-end;
 }
-
 // ==========================================
 // 3. 말풍선
 // ==========================================
@@ -186,7 +184,6 @@
     &:nth-child(2) {
       animation-delay: 150ms;
     }
-
     &:nth-child(3) {
       animation-delay: 300ms;
     }

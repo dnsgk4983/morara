@@ -6,8 +6,8 @@
 document.addEventListener("DOMContentLoaded", () => {
   "use strict";
 
-  const SAVE_KEY = "morara-seven-days-layout-v7";
-  const SETTINGS_KEY = "morara-seven-days-settings-layout-v7";
+  const SAVE_KEY = "morara-seven-days-plan-v12";
+  const SETTINGS_KEY = "morara-seven-days-settings-plan-v12";
   const days = window.MORARA_DAYS;
   const endings = window.MORARA_ENDINGS;
   const $ = (id) => document.getElementById(id);
@@ -28,6 +28,8 @@ document.addEventListener("DOMContentLoaded", () => {
     hint: $("hint"),
     presence: $("presence"),
     day: $("day-label"),
+    moon: $("moon-progress"),
+    relationship: $("relationship-status"),
     banner: $("chapter-banner"),
     bannerDate: $("chapter-date"),
     bannerTitle: $("chapter-title"),
@@ -121,7 +123,8 @@ document.addEventListener("DOMContentLoaded", () => {
           if (state.dayIndex >= days.length - 1) break;
           // 날짜 경계에서는 자동으로 넘어가지 않고 사용자의 확인을 기다립니다.
           waitingForNextDay = true;
-          ui.hint.textContent = "오늘의 대화가 끝났습니다.";
+          appendDayClosing(state.dayIndex);
+          ui.hint.textContent = "오늘 하루도 수고했어요. 준비되면 내일로 넘어가세요.";
           ui.next.hidden = false;
           ui.next.textContent = `다음 날로 넘어가기 · DAY ${days[state.dayIndex + 1].day} ›`;
           ui.choices.replaceChildren();
@@ -192,6 +195,7 @@ document.addEventListener("DOMContentLoaded", () => {
     state.bond += option.bond || 0;
     state.trust += option.trust || 0;
     Object.assign(state.flags, option.flags || {});
+    updateRelationship();
     save();
     sendPlayerMessage(option.text);
     const token = ++sequenceId;
@@ -233,7 +237,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   let state = load();
-  let settings = { speed: "normal", reducedMotion: false };
+  let settings = { speed: "normal", fontSize: "normal", reducedMotion: false };
 
   try {
     settings = { ...settings, ...JSON.parse(localStorage.getItem(SETTINGS_KEY) || "{}") };
@@ -309,6 +313,35 @@ document.addEventListener("DOMContentLoaded", () => {
       save();
     }
     scrollChat();
+  }
+
+  const DAY_CLOSINGS = [
+    ["낯선 휴대폰, 첫 번째 약속", "돌려줘야 할 휴대폰인데, 내일도 답장을 기다리게 됐다."],
+    ["조금 가까워진 거리", "엉뚱한 농담과 웃음 사이로, 모라라의 하루가 조금 익숙해졌다."],
+    ["화면 너머의 바다", "사진 속 풍경을 오래 바라봤다. 언젠가 직접 만날 수 있을까."],
+    ["쌓여 가는 달빛", "오래된 추억에도 자리가 있다는 말을 오늘은 기억하고 싶다."],
+    ["노래가 남긴 여운", "전하지 못한 말이 있다. 그래도 내일은 한 걸음 더 나아가 보자."],
+    ["드디어 내일", "모든 준비가 끝났다. 이제 약속의 날이 밝기만 기다리면 된다."]
+  ];
+
+  function appendDayClosing(dayIndex, record = true) {
+    const closing = DAY_CLOSINGS[dayIndex];
+    if (!closing || ui.chat.querySelector(`[data-day-closing="${dayIndex}"]`)) return;
+    const card = create("section", "day-closing");
+    card.dataset.dayClosing = String(dayIndex);
+    card.setAttribute("aria-label", `${dayIndex + 1}일 차 마무리`);
+    card.append(
+      create("span", "day-closing__eyebrow", `DAY ${dayIndex + 1} · 하루의 끝`),
+      create("h3", "day-closing__title", closing[0]),
+      create("p", "day-closing__text", closing[1]),
+      create("span", "day-closing__tomorrow", "오늘의 이야기는 여기까지 · 내일 계속")
+    );
+    ui.chat.appendChild(card);
+    if (record) {
+      state.history.push({ type: "day-closing", dayIndex });
+      save();
+    }
+    requestChatBottom();
   }
 
   function unlockImage(image) {
@@ -437,31 +470,46 @@ document.addEventListener("DOMContentLoaded", () => {
     ui.hint.textContent = "노래 감상은 선택 사항입니다.";
   }
 
+  // Day 7: 기획서대로 만남 여부를 먼저 판정합니다.
+  // BAD: 용기를 내지 못해 메시지를 보내지 않음 / NORMAL·TRUE: 메시지 전송 후 만남.
   function resolveEndingGate() {
-    if (state.flags.walked_away) {
+    const readyToMeet = state.bond >= 7 && state.trust >= 4;
+    if (!readyToMeet) {
+      appendMessage("thought", "(메시지 입력창에 '사실 저는…'이라고 썼다가 한 글자씩 지웠다.)");
+      appendMessage("thought", "(미안해. 지금은 도저히 보낼 수가 없어.)");
+      appendNote("해변에서 돌아온 밤 · 모라라의 새 메시지");
+      appendMessage("morara", "단장? 오늘 많이 바쁜가 보네.");
+      appendMessage("morara", "나 오늘 코랄단이랑 진짜 재밌게 놀았어ㅋㅋㅋ");
+      appendMessage("morara", "너랑도 같이 놀았으면 좋았을 텐데. 다음에 또 기회가 있겠지ㅎㅎ");
       finish("bad");
       return;
     }
-    setControls("마지막으로 어떤 말을 전할까요?");
-    addChoice("이제는 제 이름으로 연락하고 싶어요.", async () => {
-      if (interactionLocked) return;
+    setControls("해변에서 마지막 메시지를 보내자.");
+    const sendAtBeach = (text, confessed) => async () => {
+      if (interactionLocked || !state.pending) return;
+      interactionLocked = true;
       state.pending = null;
-      state.finalChoice = "join";
-      const canJoin = state.bond >= 6 && state.trust >= 4
-        && state.flags.understood_memory && state.flags.promised_to_meet
-        && state.flags.confessed;
+      state.flags.confessed = confessed;
+      state.finalChoice = confessed ? "truth" : "hesitate";
       save();
-      sendPlayerMessage("이제는 제 이름으로 연락하고 싶어요.");
+      sendPlayerMessage(text);
+      appendNote("읽음 · 답장이 오지 않는다");
+      appendMessage("thought", "(…화가 난 걸까? 아니면 직접 만나서 말하려는 걸까?)");
+      appendNote("잠시 후 · 처음 휴대폰을 주웠던 해변");
+      appendPhoto("day07_meeting.png", "해변에서 직접 마주한 모라라");
+      appendMessage("morara", "…찾았다! ㅎㅎ 여기 있었구나.");
+      appendMessage("morara", "직접 만나는 건 처음이지? 모라라 공주님 등장~!");
+      appendMessage("morara", "아, 그리고. 너 사실 원래 기사단장 아니지?");
+      appendMessage("morara", "ㅋㅋㅋ 알고 있었어. 말투도 사진도 조금 달랐거든.");
+      appendMessage("morara", "속인 건 잘못한 거 맞아. 하지만 계속 답장한 건 내 선택이었어.");
+      appendMessage("morara", "네가 어떤 사람인지 궁금했고, 너랑 이야기하는 게 즐거웠거든.");
+      const canJoin = state.bond >= 12 && state.trust >= 8
+        && state.flags.understood_memory && state.flags.promised_to_meet && confessed;
+      interactionLocked = false;
       finish(canJoin ? "true" : "normal");
-    });
-    addChoice("휴대폰을 돌려주고, 멀리서 응원할게요.", async () => {
-      if (interactionLocked) return;
-      state.pending = null;
-      state.finalChoice = "support";
-      save();
-      sendPlayerMessage("휴대폰을 돌려주고, 멀리서 응원할게요.");
-      finish("normal");
-    });
+    };
+    addChoice("사실… 저는 기사단장이 아니에요.", sendAtBeach("사실… 저는 기사단장이 아니에요.", true));
+    addChoice("해변에 도착했어요. 직접 말씀드릴게요.", sendAtBeach("해변에 도착했어요. 직접 말씀드릴게요.", false));
   }
 
   async function showEnding(kind, animate = true) {
@@ -471,7 +519,9 @@ document.addEventListener("DOMContentLoaded", () => {
     ui.opening.hidden = true;
     ui.endingScreen.hidden = true;
     ui.endingLoading.hidden = false;
+    const endingToken = sequenceId;
     if (animate) await wait(settings.reducedMotion ? 180 : 1750);
+    if (endingToken !== sequenceId) return;
     ui.endingLoading.hidden = true;
     ui.endingKind.textContent = `ENDING · ${kind.toUpperCase()}`;
     ui.endingTitle.textContent = ending.title;
@@ -480,6 +530,12 @@ document.addEventListener("DOMContentLoaded", () => {
     ui.endingStory.replaceChildren();
     for (const line of ending.lines) {
       ui.endingStory.appendChild(create("p", "ending-screen__line", line));
+    }
+    if (kind === "true" && Array.isArray(window.MORARA_COOKIE_STORYBOARD)) {
+      ui.endingStory.appendChild(create("h3", "ending-screen__cookie-title", "쿠키 영상 콘티 · 제작 대기"));
+      for (const scene of window.MORARA_COOKIE_STORYBOARD) {
+        ui.endingStory.appendChild(create("p", "ending-screen__line", scene));
+      }
     }
     ui.endingScreen.hidden = false;
     ui.endingScreen.scrollTop = 0;
@@ -497,8 +553,20 @@ document.addEventListener("DOMContentLoaded", () => {
     void showEnding(kind);
   }
 
+  function updateRelationship() {
+    const status = state.bond + state.trust;
+    const label = status >= 24 ? "깊어진 신뢰" : status >= 13 ? "서로를 알아가는 중" : status >= 5 ? "낯선 인연" : "첫 답장";
+    if (ui.relationship) ui.relationship.textContent = `관계 진행도 · ${label}`;
+  }
+
   function updateHeader() {
     const day = days[state.dayIndex];
+    if (ui.moon) {
+      const moons = ["🌒", "🌒", "🌓", "🌔", "🌔", "🌕", "🌕"];
+      ui.moon.textContent = moons[state.dayIndex] || "🌒";
+      ui.moon.setAttribute("aria-label", `달빛 진행도 ${day.day}/7`);
+    }
+    updateRelationship();
     ui.day.textContent = `DAY ${day.day} · ${day.countdown}`;
     ui.bannerDate.textContent = day.date;
     ui.bannerTitle.textContent = day.title;
@@ -511,6 +579,7 @@ document.addEventListener("DOMContentLoaded", () => {
     for (const entry of state.history) {
       if (entry.type === "message") appendMessage(entry.speaker, entry.text, false);
       if (entry.type === "note") appendNote(entry.text, false);
+      if (entry.type === "day-closing") appendDayClosing(entry.dayIndex, false);
       if (entry.type === "photo") appendPhoto(entry.image, entry.caption, false);
       if (entry.type === "activity") appendNote("활동 완료 · " + entry.selected.join(", "), false);
     }
@@ -532,7 +601,8 @@ document.addEventListener("DOMContentLoaded", () => {
       setControls("이야기가 완료되었습니다.", true, "처음 화면으로");
     } else if (state.eventIndex >= days[state.dayIndex].events.length && state.dayIndex < days.length - 1) {
       waitingForNextDay = true;
-      ui.hint.textContent = "오늘의 대화가 끝났습니다.";
+      appendDayClosing(state.dayIndex);
+      ui.hint.textContent = "오늘 하루도 수고했어요. 준비되면 내일로 넘어가세요.";
       ui.next.hidden = false;
       ui.next.textContent = `다음 날로 넘어가기 · DAY ${days[state.dayIndex + 1].day} ›`;
       requestChatBottom();
@@ -587,22 +657,36 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function restart() {
     if (!confirm("처음부터 다시 시작할까요? 현재 진행 기록이 초기화됩니다.")) return;
-    ui.endingScreen.hidden = true;
-    ui.endingLoading.hidden = true;
     sequenceId += 1;
+    interactionLocked = false;
+    pumping = false;
+    waitingForNextDay = false;
     clearTypingIndicator();
     state = initialState();
     save();
+
+    ui.endingScreen.hidden = true;
+    ui.endingLoading.hidden = true;
     ui.game.hidden = true;
-    ui.opening.hidden = false;
+    ui.opening.hidden = true;
+    ui.choices.replaceChildren();
+    ui.chat.replaceChildren();
+    ui.next.hidden = true;
+
+    // 첫 실행과 동일한 스플래시부터 다시 시작합니다.
+    splashLeaving = false;
+    ui.splashStart.disabled = false;
+    ui.splash.classList.remove("splash--leaving");
+    ui.opening.classList.remove("opening--splash-enter", "opening--transition");
+    ui.splash.hidden = false;
     showIntro();
   }
 
   function openGallery() {
     ui.galleryGrid.replaceChildren();
     const images = [
-      "day01_kingdom.png", "day03_selfie.png", "day03_sea.png",
-      "day04_memory.png", "day04_tiara.png", "day05_stars.png",
+      "day01_kingdom.png", "day02_minecraft.png", "day03_selfie.png", "day03_sea.png",
+      "day04_memory.png", "day04_tiara.png", "day05_singing.png",
       "day06_outfit.png", "day06_invite.png", "day07_festival.png",
       "day07_meeting.png", "ending_bad.png", "ending_normal.png", "ending_true.png"
     ];
@@ -656,6 +740,26 @@ document.addEventListener("DOMContentLoaded", () => {
   document.documentElement.classList.toggle("reduce-motion", settings.reducedMotion);
 
 
+  // 글자 크기는 대화·선택지·독백에 적용하며 설정에 저장합니다.
+  const fontSizes = { small: "작게", normal: "보통", large: "크게", xlarge: "아주 크게" };
+  const fontButtons = [...document.querySelectorAll(".settings__font-option")];
+  const fontSizeLabel = $("font-size-label");
+
+  function setFontSize(value) {
+    settings.fontSize = Object.hasOwn(fontSizes, value) ? value : "normal";
+    document.documentElement.dataset.fontSize = settings.fontSize;
+    fontSizeLabel.textContent = fontSizes[settings.fontSize];
+    for (const button of fontButtons) {
+      button.setAttribute("aria-pressed", String(button.dataset.fontSize === settings.fontSize));
+    }
+    saveSettings();
+  }
+
+  for (const button of fontButtons) {
+    button.addEventListener("click", () => setFontSize(button.dataset.fontSize));
+  }
+  setFontSize(settings.fontSize);
+
   // 속도는 시작 화면이 아니라 게임 내 메뉴(☰)의 설정창에서 변경합니다.
   let previewToken = 0;
 
@@ -696,14 +800,32 @@ document.addEventListener("DOMContentLoaded", () => {
     ui.previewBubble.textContent = "오늘은 무슨 이야기를 해볼까?\n아, 먼저 물어볼 게 있어!";
   });
 
+  const splashScene = $("splash-scene");
+  const splashTouch = $("splash-touch");
+  splashScene.addEventListener("pointerdown", (event) => {
+    if (settings.reducedMotion || !splashTouch || event.target.closest("button")) return;
+    const bounds = splashScene.getBoundingClientRect();
+    const spark = document.createElement("span");
+    spark.className = "splash__scene__touch__spark";
+    spark.style.left = `${event.clientX - bounds.left}px`;
+    spark.style.top = `${event.clientY - bounds.top}px`;
+    splashTouch.appendChild(spark);
+    spark.addEventListener("animationend", () => spark.remove(), { once: true });
+  });
+
   let splashLeaving = false;
   ui.splashStart.addEventListener("click", async () => {
     if (splashLeaving) return;
     splashLeaving = true;
-    ui.splash.classList.add("is-fading");
-    await wait(settings.reducedMotion ? 10 : 500);
+    ui.splashStart.disabled = true;
+    ui.opening.classList.remove("opening--transition");
+    ui.opening.classList.add("opening--splash-enter");
+    ui.splash.classList.add("splash--leaving");
+    await wait(settings.reducedMotion ? 20 : 850);
     ui.splash.hidden = true;
-    ui.opening.classList.add("opening--transition");
+    ui.opening.hidden = false;
+    ui.opening.classList.remove("opening--splash-enter");
+    showIntro();
   });
 
   showIntro();

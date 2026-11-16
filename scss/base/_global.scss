@@ -78,7 +78,6 @@ body {
 .footer {
   flex-shrink: 0;
 }
-
 .chat {
   flex: 1;
   min-height: 0;
@@ -98,7 +97,6 @@ body {
 .chat::-webkit-scrollbar {
   width: 5px;
 }
-
 .chat::-webkit-scrollbar-thumb {
   background: #e7c7de;
   border-radius: 999px;
@@ -107,7 +105,6 @@ body {
 .chat::-webkit-scrollbar-track {
   background: transparent;
 }
-
 // ==========================================
 // 5. 입력 요소
 // ==========================================
@@ -116,7 +113,6 @@ input,
 textarea {
   min-width: 0;
 }
-
 // ==========================================
 // 6. 애니메이션 접근성
 // ==========================================

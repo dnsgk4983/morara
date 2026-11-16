@@ -36,7 +36,6 @@
     &::-webkit-scrollbar {
       width: 4px;
     }
-
     &::-webkit-scrollbar-thumb {
       background: #e7c7de;
       border-radius: 4px;
@@ -46,7 +45,6 @@
   .freeform {
     flex-shrink: 0;
   }
-
   .status {
     flex-shrink: 0;
     min-width: 0;

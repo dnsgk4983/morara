@@ -38,7 +38,6 @@
 .intro__stage.is-portal .intro__image {
   animation: intro-swirl 1.5s ease-in-out both;
 }
-
 .intro__glow {
   position: absolute;
   inset: 0;
@@ -132,7 +131,6 @@
 .intro__notification[hidden] {
   display: none !important;
 }
-
 .intro.is-leaving {
   animation: intro-leave 0.65s ease forwards;
   pointer-events: none;

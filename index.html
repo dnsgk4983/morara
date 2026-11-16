@@ -5,15 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#191525">
   <title>공주님, 답장은 제가 할게요</title>
-  <link rel="stylesheet" href="./css/style.css?v=clean-v11-1-20261116">
-  <script src="./data/story.js?v=clean-v11-1-20261116" defer></script>
-  <script src="./js/main.js?v=clean-v11-1-20261116" defer></script>
+  <link rel="stylesheet" href="./css/style.css?v=restart-splash-v12-8-20261117">
+  <script src="./data/story.js?v=restart-splash-v12-8-20261117" defer></script>
+  <script src="./js/main.js?v=restart-splash-v12-8-20261117" defer></script>
 </head>
 <body>
   <section class="splash splash--image-title" id="splash" aria-label="시작 화면">
     <div class="splash__scene" id="splash-scene">
       <img class="splash__scene__art" src="./assets/images/title_bg.png" alt="" aria-hidden="true">
-      <img class="splash__scene__title" src="./assets/images/title_text.png" alt="공주님, 답장은 제가 할게요 — 기사단장, 타타 막혔습니다!">
+      <div class="splash__scene__sparkles" aria-hidden="true"></div>
+      <div class="splash__scene__touch" id="splash-touch" aria-hidden="true"></div>
+      <img class="splash__scene__title" src="./assets/images/title_text.png" alt="공주님, 답장은 제가 할게요 — 기사단장 대타 뛰겠습니다!">
       <button class="splash__scene__start__button" id="splash-start" type="button"><span>이야기 시작하기</span></button>
     </div>
   </section>
@@ -44,6 +46,7 @@
           </div>
         </div>
         <div class="topbar__actions">
+          <span class="moon-progress" id="moon-progress" aria-label="달빛 진행도">🌒</span>
           <span class="day-pill" id="day-label">DAY 1 · D-6</span>
           <button class="icon-button" id="menu-button" type="button" aria-label="설정 열기">☰</button>
         </div>
@@ -83,7 +86,18 @@
       <button class="settings__preview-button" id="speed-test" type="button">선택한 속도 미리보기</button>
       <div class="settings__preview" id="speed-preview" aria-live="polite" hidden><div class="preview-bubble" id="preview-bubble"></div></div>
     </section>
+    <section class="settings__font" aria-label="글자 크기 설정">
+      <div class="settings__speed-title"><strong>대화 글자 크기</strong><span id="font-size-label">보통</span></div>
+      <div class="settings__font-options" role="group" aria-label="글자 크기 선택">
+        <button class="settings__font-option" type="button" data-font-size="small" aria-pressed="false">작게</button>
+        <button class="settings__font-option" type="button" data-font-size="normal" aria-pressed="true">보통</button>
+        <button class="settings__font-option" type="button" data-font-size="large" aria-pressed="false">크게</button>
+        <button class="settings__font-option" type="button" data-font-size="xlarge" aria-pressed="false">아주 크게</button>
+      </div>
+      <p class="settings__font-preview">오늘은 무슨 이야기를 해볼까?</p>
+    </section>
     <label class="settings__field settings__field--toggle" for="motion-toggle"><span class="settings__field-copy"><strong>애니메이션 최소화</strong><small>움직임을 줄여 편안하게 감상합니다.</small></span><span class="settings__switch"><input type="checkbox" id="motion-toggle"><span class="settings__switch-track" aria-hidden="true"></span></span></label>
+    <p class="settings__note" id="relationship-status">관계 진행도 · 아직 이야기가 시작되지 않았습니다.</p>
     <button class="secondary-button" id="gallery-button" type="button">일러스트 갤러리</button>
     <button class="secondary-button" id="restart-button" type="button">처음부터 시작</button>
     <p class="settings__note">진행 기록은 이 브라우저에 자동 저장됩니다. 원본 이미지 파일은 변경하지 않았습니다.</p>

@@ -5,4 +5,3 @@
 @mixin vw($property, $value) {
   #{$property}: min(#{math.div($value, 600px) * 100}vw, #{$value});
 }
-

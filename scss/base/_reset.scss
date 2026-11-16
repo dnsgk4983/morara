@@ -9,7 +9,6 @@
 *::after {
   box-sizing: border-box;
 }
-
 // 기본 문서 설정
 html {
   margin: 0;
@@ -32,7 +31,6 @@ figure,
 blockquote {
   margin: 0;
 }
-
 // 페이지 최소 크기
 body {
   min-width: 320px;
@@ -46,7 +44,6 @@ textarea,
 select {
   font: inherit;
 }
-
 // 버튼 초기화
 button {
   padding: 0;
@@ -59,7 +56,6 @@ button {
 button:disabled {
   cursor: not-allowed;
 }
-
 // 이미지 및 미디어
 img,
 svg,
@@ -86,7 +82,6 @@ ol {
 [hidden] {
   display: none !important;
 }
-
 // 키보드 접근성
 :focus-visible {
   outline: 2px solid #a95b8b;
